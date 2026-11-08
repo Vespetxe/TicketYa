@@ -1,0 +1,39 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: eventos-catalogo
+
+  # Base de Datos Relacional propia del Microservicio
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticketya_events_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # Cambiar a 'validate' en entornos de producción con migraciones
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Configuración de OpenAPI / Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+# Logging y Trazabilidad
+logging:
+  level:
+    root: INFO
+    com.ticketya.events: DEBUG
+    org.hibernate.SQL: DEBUG
