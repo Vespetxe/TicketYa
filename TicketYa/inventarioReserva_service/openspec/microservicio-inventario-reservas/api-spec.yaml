@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: API del Microservicio de Inventario y Reservas - TicketYa
+  version: 1.0.0
+  description: Servicio encargado exclusivamente de gestionar el inventario de asientos/cupos y garantizar la prevención de la doble venta.
+paths:
+
+  # 1. Crear reserva temporal
+  /reservas:
+    post:
+      summary: Crear reserva temporal
+      description: Bloquea temporalmente (ej. 10 min) asientos o cupos seleccionados por el cliente durante el proceso de compra.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clienteId, eventoId, sectorId, cantidad]
+              properties:
+                clienteId: { type: integer, example: 101 }
+                eventoId: { type: integer, example: 50 }
+                sectorId: { type: integer, example: 3 }
+                cantidad: { type: integer, example: 2 }
+                asientosIds:
+                  type: array
+                  items: { type: integer }
+                  example: [12, 13]
+      responses:
+        '201':
+          description: Reserva temporal creada exitosamente.
+        '409':
+          description: Conflicto - Asiento ocupado o capacidad insuficiente (Prevención de doble venta).
+
+  # 2. Consultar reserva por ID
+  /reservas/{id}:
+    get:
+      summary: Consultar reserva
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Detalle de la reserva retornado.
+        '404':
+          description: Reserva no encontrada.
+
+  # 3. Consultar reservas de un cliente
+  /reservas?clienteId={clienteId}:
+    get:
+      summary: Consultar reservas de cliente
+      parameters:
+        - name: clienteId
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Listado de reservas del cliente retornado.
+
+  # 4. Confirmar ocupación
+  /reservas/{id}/confirmar:
+    post:
+      summary: Confirmar ocupación
+      description: Confirma definitivamente los lugares cuando el Microservicio de Compras aprueba el pago.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Ocupación confirmada con éxito.
+        '404':
+          description: Reserva no encontrada o expirada.
+
+  # 5. Liberar reserva
+  /reservas/{id}/liberar:
+    post:
+      summary: Liberar reserva
+      description: Libera de inmediato los lugares si el pago fue rechazado o el usuario canceló la compra.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Reserva liberada y lugares restablecidos al inventario.
+
+  # 6. Consultar disponibilidad por evento y sector
+  /disponibilidad/eventos/{eventoId}/sectores/{sectorId}:
+    get:
+      summary: Consultar disponibilidad
+      parameters:
+        - name: eventoId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: sectorId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Disponibilidad actual (asientos libres o aforo restante).
+
+  # 7. Liberar lugares por devolución
+  /ocupaciones/liberar:
+    post:
+      summary: Liberar lugares por devolución
+      description: Restablece el stock de lugares tras la aprobación de una devolución de entradas (hasta 72 hs antes del evento).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventoId, sectorId, cantidad]
+              properties:
+                eventoId: { type: integer }
+                sectorId: { type: integer }
+                cantidad: { type: integer }
+                asientosIds:
+                  type: array
+                  items: { type: integer }
+      responses:
+        '200':
+          description: Lugares devueltos al inventario disponible.
+
+  # 8. Inicializar inventario de evento
+  /eventos/{eventoId}/inventario:
+    post:
+      summary: Inicializar inventario de evento
+      description: Crea la grilla de asientos numerados o el aforo total al momento de publicar el evento en el servicio de Eventos.
+      parameters:
+        - name: eventoId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sectorId, esNumerado, capacidadTotal]
+              properties:
+                sectorId: { type: integer }
+                esNumerado: { type: boolean }
+                capacidadTotal: { type: integer }
+      responses:
+        '201':
+          description: Stock inicial creado exitosamente.
+
+  # 9. Liberar o invalidar inventario por cancelación
+  /eventos/{eventoId}/cancelar-inventario:
+    post:
+      summary: Liberar o invalidar inventario por cancelación
+      description: Marca o bloquea todo el inventario de un evento cuando es cancelado globalmente por la organización o un administrador.
+      parameters:
+        - name: eventoId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Inventario del evento invalidadas/canceladas correctamente.
