@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  TicketYa es una plataforma de venta de entradas
+  desarrollada para el Trabajo Practico Final
+  de Arquitecturas Web (TUDAI 2026).
+
+  Arquitectura:
+  - Microservicios independientes con Spring Boot.
+  - Lenguaje Java.
+  - Maven como gestor de dependencias.
+  - APIs REST con comunicacion sincrona.
+  - API Gateway como punto de entrada.
+  - Base de datos relacional independiente por microservicio.
+  - Spring Data JPA e Hibernate.
+  - OpenAPI/Swagger para documentacion.
+  - JUnit y Mockito para testing.
+
+  Microservicios:
+  - Eventos: catalogo, lugares, sectores y precios.
+  - Reservas: disponibilidad y reservas temporales.
+  - Compras: compras, pagos simulados y devoluciones.
+  - Entradas: emision y gestion de tickets QR.
+
+  Primera entrega:
+  - Implementar el circuito completo de compra.
+  - Evitar la doble venta de entradas.
+  - Gestionar devoluciones y cancelaciones.
+  - Documentar APIs, arquitectura y modelos de datos.
+  - Ejecutar pruebas unitarias y de concurrencia.
+
+  El desarrollo debe priorizar codigo mantenible,
+  responsabilidades claras y contratos REST consistentes.
