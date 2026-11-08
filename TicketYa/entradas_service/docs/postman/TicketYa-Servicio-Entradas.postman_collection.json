@@ -1,0 +1,56 @@
+{
+  "info": {
+    "name": "TicketYa - Servicio de Entradas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8083" },
+    { "key": "orderId", "value": "ord-1042" },
+    { "key": "eventId", "value": "evt-80" },
+    { "key": "clientId", "value": "cli-17" },
+    { "key": "ticketId", "value": "00000000-0000-4000-8000-000000000001" }
+  ],
+  "item": [
+    {
+      "name": "Emitir entradas por orden confirmada",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{orderId}}\"\n}" },
+        "url": "{{baseUrl}}/internal/tickets/issue"
+      }
+    },
+    {
+      "name": "Consultar entradas por orden",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tickets?orderId={{orderId}}"
+      }
+    },
+    {
+      "name": "Consultar entradas por cliente",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tickets?clientId={{clientId}}"
+      }
+    },
+    {
+      "name": "Anular una entrada",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"ANULADA\"\n}" },
+        "url": "{{baseUrl}}/internal/tickets/{{ticketId}}/status"
+      }
+    },
+    {
+      "name": "Actualizar entradas por orden y evento",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"eventId\": \"{{eventId}}\",\n  \"status\": \"REINTEGRADA\"\n}" },
+        "url": "{{baseUrl}}/internal/tickets/status"
+      }
+    }
+  ]
+}

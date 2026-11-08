@@ -1,0 +1,237 @@
+openapi: 3.1.0
+info:
+  title: TicketYa Servicio de Entradas
+  version: 1.0.0
+  description: API de emisión, consulta y anulación de entradas para la entrega 1.
+servers:
+  - url: http://localhost:8083
+paths:
+  /internal/tickets/issue:
+    post:
+      summary: Emitir las entradas de una orden confirmada
+      description: Emite un lote completo de forma idempotente por orderId. Compras debe confirmar la orden.
+      operationId: issueTickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueTicketsRequest'
+            example:
+              orderId: ord-1042
+      responses:
+        '201':
+          description: Lote creado por primera vez
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketIssuanceResult'
+        '200':
+          description: Reintento; devuelve el lote existente sin duplicar tickets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketIssuanceResult'
+        '400':
+          description: Request inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: La orden no existe en Compras
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: La orden no está confirmada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          description: El detalle de la orden no permite emitir entradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          description: Compras no está disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /tickets:
+    get:
+      summary: Consultar entradas por orden o cliente
+      description: Debe enviarse exactamente uno de orderId o clientId. Sin resultados devuelve una lista vacía.
+      operationId: queryTickets
+      parameters:
+        - name: orderId
+          in: query
+          required: false
+          schema:
+            type: string
+          example: ord-1042
+        - name: clientId
+          in: query
+          required: false
+          schema:
+            type: string
+          example: cli-17
+      responses:
+        '200':
+          description: Entradas del filtro solicitado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Debe enviarse exactamente un filtro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /internal/tickets/{ticketId}/status:
+    patch:
+      summary: Anular o reintegrar una entrada
+      operationId: updateTicketStatus
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketStatusRequest'
+            example:
+              orderId: ord-1042
+              status: ANULADA
+      responses:
+        '200':
+          description: Estado actual del ticket, idempotente ante repeticiones
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Estado inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: No existe el ticket para la orden indicada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /internal/tickets/status:
+    patch:
+      summary: Actualizar entradas de una orden para un evento
+      description: Usado por Compras al procesar devoluciones coordinadas o la cancelación de un evento.
+      operationId: updateOrderEventTicketStatuses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderEventStatusRequest'
+            example:
+              orderId: ord-1042
+              eventId: evt-80
+              status: REINTEGRADA
+      responses:
+        '200':
+          description: Entradas actualizadas; una lista vacía indica que no había entradas afectadas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Request o estado inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    IssueTicketsRequest:
+      type: object
+      required: [orderId]
+      properties:
+        orderId:
+          type: string
+    TicketIssuanceResult:
+      type: object
+      required: [tickets, created]
+      properties:
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+        created:
+          type: boolean
+    TicketStatusRequest:
+      type: object
+      required: [orderId, status]
+      properties:
+        orderId:
+          type: string
+        status:
+          type: string
+          enum: [ANULADA, REINTEGRADA]
+    OrderEventStatusRequest:
+      type: object
+      required: [orderId, eventId, status]
+      properties:
+        orderId:
+          type: string
+        eventId:
+          type: string
+        status:
+          type: string
+          enum: [ANULADA, REINTEGRADA]
+    Ticket:
+      type: object
+      required: [ticketId, qr, orderId, eventId, clientId, sectorId, status]
+      properties:
+        ticketId:
+          type: string
+          format: uuid
+        qr:
+          type: string
+          format: uuid
+          description: Valor opaco codificado en el QR, sin datos personales.
+        orderId:
+          type: string
+        eventId:
+          type: string
+        clientId:
+          type: string
+        sectorId:
+          type: string
+        seatId:
+          type: [string, 'null']
+          description: Omitido o nulo si el sector no es numerado.
+        status:
+          type: string
+          enum: [EMITIDA, ANULADA, REINTEGRADA]
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
