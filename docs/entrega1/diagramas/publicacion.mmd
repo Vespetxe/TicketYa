@@ -10,11 +10,11 @@ sequenceDiagram
         I->>I: Crear PREPARADO o reutilizar configuracion compatible
         I-->>E: 201 sin habilitar reservas
     end
-    Note over E,I: Fallo temporal deja BORRADOR y sectores PREPARADO; POST reservas devuelve 409
+    Note over E,I: Fallo temporal deja BORRADOR y sectores PREPARADO#59; POST reservas devuelve 409
     E->>E: Commit PUBLICADO con control de version
     E->>I: POST internal eventos id publicar
-    I->>I: Lock control_evento; PREPARADO a HABILITADO en todos los sectores
+    I->>I: Lock control_evento#59; PREPARADO a HABILITADO en todos los sectores
     I-->>E: 200 o 409 si ya suspendido/cancelado
     E-->>O: PUBLICADO via Gateway
-    Note over E,I: Si falla el ultimo REST: 503; repetir PUBLICADO solo retoma habilitacion
+    Note over E,I: Si falla el ultimo REST: 503#59; repetir PUBLICADO solo retoma habilitacion
     Note over E,I: Inicializacion incompatible 400/409 se comunica como 422 permanente

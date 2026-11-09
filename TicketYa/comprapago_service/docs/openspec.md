@@ -1,6 +1,6 @@
 # OpenSpec de Compras y Pagos
 
-Las especificaciones utilizadas se conservan en [openspec](../openspec/) del proyecto `TicketYa/comprapago_service`. El artifactId Maven es `compras-service`; **no es el nombre del directorio**. La configuración local es [openspec/config.yaml](../openspec/config.yaml), con esquema `spec-driven`.
+Las especificaciones utilizadas se conservan en [openspec](../openspec/changes/compras-pagos/proposal.md) del proyecto `TicketYa/comprapago_service`. El artifactId Maven es `compras-service`; **no es el nombre del directorio**. La configuración local es [openspec/config.yaml](../openspec/config.yaml), con esquema `spec-driven`.
 
 Con la CLI OpenSpec instalada, ejecutar desde la raíz de este repositorio:
 

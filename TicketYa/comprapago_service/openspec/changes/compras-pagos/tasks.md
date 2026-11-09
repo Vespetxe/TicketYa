@@ -109,15 +109,15 @@ docs/flujo-compra.md. No se ejecutó migración sobre desarrollo.
 
 ## 7. Integración entre microservicios
 
-- [ ] 7.1 Revisar con los integrantes del grupo los contratos REST reales de Eventos, Reservas y Entradas. Verificar que exista un acuerdo documentado sobre endpoints, DTO, identificadores y estados.
-- [ ] 7.2 Reemplazar las implementaciones simuladas de los clientes externos por clientes REST compatibles con los contratos acordados. Verificar la comunicación con cada microservicio mediante pruebas de integración.
-- [ ] 7.3 Configurar las direcciones de los microservicios, los tiempos de espera y el manejo de errores de comunicación. Verificar el comportamiento cuando un servicio no esté disponible.
-- [ ] 7.4 Integrar Compras y Pagos con el API Gateway del grupo. Verificar que los endpoints sean accesibles mediante las rutas acordadas.
-- [ ] 7.5 Ejecutar una prueba integral de compra exitosa desde la reserva hasta la emisión de entradas. Verificar que todos los servicios registren resultados consistentes.
-- [ ] 7.6 Ejecutar pruebas integrales de pago rechazado, reserva vencida y errores de comunicación. Verificar que no se produzcan cobros, confirmaciones o emisiones duplicadas.
-- [ ] 7.7 Ejecutar una prueba integral de devolución y otra de cancelación de evento. Verificar que los reintegros, anulaciones y liberaciones sean consistentes.
-- [ ] 7.8 Ejecutar pruebas de concurrencia junto con Reservas para comprobar que dos clientes no puedan adquirir el mismo asiento. Verificar que solamente una operación pueda confirmar su adquisición.
-- [ ] 7.9 Preparar una colección Postman y documentar los pasos para ejecutar Compras y Pagos. Verificar que otra persona pueda reproducir los escenarios principales siguiendo la documentación.
+- [x] 7.1 Revisar con los integrantes del grupo los contratos REST reales de Eventos, Reservas y Entradas. Verificar que exista un acuerdo documentado sobre endpoints, DTO, identificadores y estados.
+- [x] 7.2 Reemplazar las implementaciones simuladas de los clientes externos por clientes REST compatibles con los contratos acordados. Verificar la comunicación con cada microservicio mediante pruebas de integración.
+- [x] 7.3 Configurar las direcciones de los microservicios, los tiempos de espera y el manejo de errores de comunicación. Verificar el comportamiento cuando un servicio no esté disponible.
+- [x] 7.4 Integrar Compras y Pagos con el API Gateway del grupo. Verificar que los endpoints sean accesibles mediante las rutas acordadas.
+- [x] 7.5 Ejecutar una prueba integral de compra exitosa desde la reserva hasta la emisión de entradas. Verificar que todos los servicios registren resultados consistentes.
+- [x] 7.6 Ejecutar pruebas integrales de pago rechazado, reserva vencida y errores de comunicación. Verificar que no se produzcan cobros, confirmaciones o emisiones duplicadas.
+- [x] 7.7 Ejecutar una prueba integral de devolución y otra de cancelación de evento. Verificar que los reintegros, anulaciones y liberaciones sean consistentes.
+- [x] 7.8 Ejecutar pruebas de concurrencia junto con Reservas para comprobar que dos clientes no puedan adquirir el mismo asiento. Verificar que solamente una operación pueda confirmar su adquisición.
+- [x] 7.9 Preparar una colección Postman y documentar los pasos para ejecutar Compras y Pagos. Verificar que otra persona pueda reproducir los escenarios principales siguiendo la documentación.
 
 ## Seguimiento posterior
 

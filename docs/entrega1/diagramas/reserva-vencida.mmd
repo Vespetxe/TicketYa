@@ -12,7 +12,7 @@ sequenceDiagram
     G->>P: Crear compra
     P->>I: Validar reserva
     P-->>C: Compra PENDIENTE via Gateway
-    I->>I: Scheduler tras vencimiento; bloqueo y EXPIRADA; liberar stock
+    I->>I: Scheduler tras vencimiento#59; bloqueo y EXPIRADA#59; liberar stock
     C->>G: POST pagos despues del vencimiento
     G->>P: Intentar pago
     P->>I: Consultar reserva

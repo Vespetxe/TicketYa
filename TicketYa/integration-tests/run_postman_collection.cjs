@@ -31,7 +31,7 @@ async function main() {
   values.set('base_url',`http://127.0.0.1:${18080+offset}`);
   let checks=0, requests=0;
   const results=[];
-  const replace = text => text.replace(/\{\{([^}]+)\}\}/g,(_,key)=>{
+  const replace = text => text.replace(/\{\{([^}]+)}}/g,(_,key)=>{
     if(key==='$guid')return randomUUID();
     assert(values.has(key),`Variable no declarada ${key}`);return String(values.get(key));
   });

@@ -6,7 +6,7 @@ sequenceDiagram
     participant P as Compras
     participant S as Pasarela simulada en Compras
     participant T as Entradas
-    Note over E,I: Inventario PREPARADO no reservable; PUBLICADO confirmado y habilitacion comercial completada
+    Note over E,I: Inventario PREPARADO no reservable#59; PUBLICADO confirmado y habilitacion comercial completada
     C->>G: GET disponibilidad
     G->>I: GET disponibilidad evento sector
     I-->>C: Asientos operativos libres via Gateway
@@ -33,7 +33,7 @@ sequenceDiagram
     P->>T: POST internal tickets issue con orderId
     T->>P: GET internal orders id
     P-->>T: Proyeccion CONFIRMADA sin cancelacion solicitada
-    T->>T: Bloquear gate evento y lote orden; crear ticket UUID y QR por unidad
+    T->>T: Bloquear gate evento y lote orden#59; crear ticket UUID y QR por unidad
     T-->>P: 201 lote creado o 200 lote existente
     P->>P: COMPLETADA y FINALIZADA
     P-->>C: Resultado APROBADO via Gateway

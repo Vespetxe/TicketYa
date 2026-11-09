@@ -17,13 +17,13 @@ sequenceDiagram
         I->>I: Crear PREPARADO o reutilizar configuracion compatible
         I-->>E: 201 sin habilitar reservas
     end
-    Note over E,I: Fallo temporal deja BORRADOR y sectores PREPARADO; POST reservas devuelve 409
+    Note over E,I: Fallo temporal deja BORRADOR y sectores PREPARADO#59; POST reservas devuelve 409
     E->>E: Commit PUBLICADO con control de version
     E->>I: POST internal eventos id publicar
-    I->>I: Lock control_evento; PREPARADO a HABILITADO en todos los sectores
+    I->>I: Lock control_evento#59; PREPARADO a HABILITADO en todos los sectores
     I-->>E: 200 o 409 si ya suspendido/cancelado
     E-->>O: PUBLICADO via Gateway
-    Note over E,I: Si falla el ultimo REST: 503; repetir PUBLICADO solo retoma habilitacion
+    Note over E,I: Si falla el ultimo REST: 503#59; repetir PUBLICADO solo retoma habilitacion
     Note over E,I: Inicializacion incompatible 400/409 se comunica como 422 permanente
 ```
 
@@ -40,7 +40,7 @@ sequenceDiagram
     participant P as Compras
     participant S as Pasarela simulada en Compras
     participant T as Entradas
-    Note over E,I: Inventario PREPARADO no reservable; PUBLICADO confirmado y habilitacion comercial completada
+    Note over E,I: Inventario PREPARADO no reservable#59; PUBLICADO confirmado y habilitacion comercial completada
     C->>G: GET disponibilidad
     G->>I: GET disponibilidad evento sector
     I-->>C: Asientos operativos libres via Gateway
@@ -67,7 +67,7 @@ sequenceDiagram
     P->>T: POST internal tickets issue con orderId
     T->>P: GET internal orders id
     P-->>T: Proyeccion CONFIRMADA sin cancelacion solicitada
-    T->>T: Bloquear gate evento y lote orden; crear ticket UUID y QR por unidad
+    T->>T: Bloquear gate evento y lote orden#59; crear ticket UUID y QR por unidad
     T-->>P: 201 lote creado o 200 lote existente
     P->>P: COMPLETADA y FINALIZADA
     P-->>C: Resultado APROBADO via Gateway
@@ -127,7 +127,7 @@ sequenceDiagram
     G->>P: Crear compra
     P->>I: Validar reserva
     P-->>C: Compra PENDIENTE via Gateway
-    I->>I: Scheduler tras vencimiento; bloqueo y EXPIRADA; liberar stock
+    I->>I: Scheduler tras vencimiento#59; bloqueo y EXPIRADA#59; liberar stock
     C->>G: POST pagos despues del vencimiento
     G->>P: Intentar pago
     P->>I: Consultar reserva
@@ -181,7 +181,7 @@ sequenceDiagram
     P->>I: Registrar devolucion por identidad estable
     I->>I: Reponer solo el asiento elegido si corresponde
     P-->>A: FINALIZADA via Gateway
-    Note over P,I: Repeticion no duplica reintegro ni stock; otros tickets siguen EMITIDA
+    Note over P,I: Repeticion no duplica reintegro ni stock#59; otros tickets siguen EMITIDA
 ```
 
 [Fuente Mermaid](diagramas/devolucion-parcial.mmd).
@@ -225,7 +225,7 @@ sequenceDiagram
     else Turno ocupado o dependencia pendiente
         P-->>E: 202 pendientes
         E-->>A: 503 recuperable via Gateway
-        Note over A,P: Repetir cancelacion; no crear otra identidad financiera
+        Note over A,P: Repetir cancelacion#59; no crear otra identidad financiera
     end
 ```
 

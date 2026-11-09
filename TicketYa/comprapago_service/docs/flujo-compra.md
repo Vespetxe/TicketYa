@@ -46,7 +46,7 @@ sequenceDiagram
             Pagos->>Pasarela: procesarPago (misma clave, importe persistido)
             alt Respuesta desconocida
                 Pagos->>Registro: persistir RESULTADO_DESCONOCIDO
-                Note over Cliente,Pagos: Repetir POST con la misma clave consulta el resultado; otra clave produce 409
+                Note over Cliente,Pagos: Repetir POST con la misma clave consulta el resultado#59; otra clave produce 409
             else Pago rechazado
                 Pagos->>Registro: persistir RECHAZADO / etapa LIBERACION
                 Pagos->>Reservas: liberarReserva
@@ -113,7 +113,7 @@ sequenceDiagram
                 Note over Pagos,Registro: Operación recuperable
             else Reintegro explícitamente rechazado
                 Pagos->>Registro: Guardar Reintegro RECHAZADO y pago APROBADO
-                Note over Pagos,Registro: Compra incompleta; no repetir reintegro rechazado
+                Note over Pagos,Registro: Compra incompleta#59; no repetir reintegro rechazado
             else Reintegro confirmado
                 Pagos->>Registro: Guardar REINTEGRADO_TOTAL y etapa LIBERACION
                 Pagos->>Reserva: Compensar reserva y verificar LIBERADA
