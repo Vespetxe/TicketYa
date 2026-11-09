@@ -10,7 +10,7 @@ Esta es la documentación vigente de la implementación local. El enunciado es `
 | [Secuencias](secuencias.md) | Compra aprobada, rechazada, vencimiento y cancelación |
 | [Modelo de datos](modelo-datos.md) | Cuatro ER, restricciones e identidades |
 | [OpenAPI](openapi/README.md) | Inventario de endpoints y cinco contratos |
-| [Pruebas](pruebas.md) | Evidencia previa y ejecución aislada |
+| [Pruebas](pruebas.md) | JUnit, concurrencia entre dos instancias e informes locales |
 | [Demostración](demostracion.md) | Postman y datos reproducibles |
 | [Limitaciones y antecedentes](limitaciones.md) | Alcance real y documentos históricos |
 | [README principal](../../README.md) | Preparación y arranque desde cero |

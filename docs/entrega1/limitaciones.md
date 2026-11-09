@@ -15,7 +15,7 @@ Este documento registra decisiones y límites observables del código. No declar
 
 ## Documentación histórica que no debe usarse como contrato actual
 
-Se conserva para no borrar el trabajo previo. Se recomienda retirarla del circuito de lectura de la entrega o archivarla después de revisión del equipo; no se eliminó ningún archivo.
+Los documentos de esta tabla conservan su alcance original. Los resultados vigentes se obtienen ejecutando el [procedimiento de pruebas](pruebas.md).
 
 | Antecedente | Motivo y reemplazo |
 |---|---|

@@ -120,6 +120,8 @@ Una compra todavía pendiente también puede cancelarse mediante POST `/compras/
 ### HU14. Evitar sobreventa concurrente
 Como organizador quiero preservar capacidad ante solicitudes simultáneas.
 
+La prueba `diezSolicitudesDosInstanciasUltimoCupo` envía diez reservas por un único cupo y comprueba la compra del ganador. [Ejecución aislada](pruebas.md).
+
 - Principal: varias solicitudes compiten por el mismo lugar o límite de cliente.
 - Aceptación: los bloqueos de inventario y control de límite en BD permiten una sola ocupación válida y no exceden el límite; dos instancias de Inventario comparten esa protección.
 - Alternativas: perdedores reciben conflicto y pueden volver a consultar disponibilidad.

@@ -1,0 +1,853 @@
+{
+  "info": {
+    "name": "TicketYa — Entrega 1 por Gateway",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Demostración pública integrada con datos dinámicos. No ejecutar en bases existentes de desarrollo. No incluye comandos internos. Datos y scripts documentales, sin ejecución automática durante su generación."
+  },
+  "descripcion": "Ejecutar completa y en orden sobre esquemas nuevos. Crea datos propios; la carpeta numerada compra dos asientos y devuelve el elegido, las otras una unidad. Claves estables en reintentos. No limpiar ni usar bases de desarrollo.",
+  "entorno": "TicketYa local NUEVO — ejemplo sin secretos",
+  "variables": {
+    "base_url": "http://localhost:8080",
+    "cliente_id": "1",
+    "organizador_id": "1",
+    "administrador_id": "7",
+    "ciudad": "Tandil",
+    "otro_asiento_id": "",
+    "importe_devolucion": "",
+    "run_id": "",
+    "fecha_evento": "",
+    "desde": "",
+    "hasta": "",
+    "precio": "",
+    "venue_id": "",
+    "participant_id": "",
+    "sector_id": "",
+    "evento_id": "",
+    "asiento_id": "",
+    "reserva_id": "",
+    "compra_id": "",
+    "importe": "",
+    "clave_pago": "",
+    "entrada_local_id": "",
+    "ticket_uuid": "",
+    "qr": "",
+    "devolucion_id": "",
+    "clave_devolucion": "",
+    "reintegro_id": ""
+  },
+  "carpetas": [
+    {
+      "nombre": "1 Compra numerada aprobada y devolución",
+      "pasos": [
+        "01-1",
+        "02-1",
+        "03-1",
+        "04-1",
+        "05-1",
+        "06-1",
+        "07-1",
+        "08-1",
+        "09-1",
+        "10-1",
+        "11-1",
+        "12-1",
+        "13-1",
+        "14-1",
+        "15-1",
+        "16-1",
+        "17-1",
+        "18-1",
+        "18b-1",
+        "19-1",
+        "20-1",
+        "21-1",
+        "22-1",
+        "23-1",
+        "24-1",
+        "25-1",
+        "26-1",
+        "27-1",
+        "28-1",
+        "29-1",
+        "30-1",
+        "31-1"
+      ]
+    },
+    {
+      "nombre": "2 Compra general y cancelación",
+      "pasos": [
+        "01-1",
+        "02-1",
+        "03-2",
+        "04-1",
+        "05-1",
+        "06-1",
+        "07-1",
+        "08-1",
+        "09-1",
+        "11-2",
+        "12-2",
+        "13-1",
+        "14-1",
+        "15-2",
+        "16-1",
+        "17-1",
+        "18-1",
+        "18b-1",
+        "19-2",
+        "20-1",
+        "21-2",
+        "22-2",
+        "23-2",
+        "24-2",
+        "25-2"
+      ]
+    },
+    {
+      "nombre": "3 Pago rechazado y liberación",
+      "pasos": [
+        "01-3",
+        "02-1",
+        "03-2",
+        "04-1",
+        "05-1",
+        "06-1",
+        "07-1",
+        "08-1",
+        "09-1",
+        "11-2",
+        "12-2",
+        "13-1",
+        "14-1",
+        "15-2",
+        "16-3",
+        "17-3",
+        "18-3",
+        "19-3",
+        "20-1",
+        "21-3"
+      ]
+    }
+  ],
+  "operaciones": {
+    "01-1": {
+      "nombre": "01 Crear lugar nuevo",
+      "metodo": "POST",
+      "ruta": "/api/v1/venues",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"name\": \"Sala {{run_id}}\",",
+        "  \"address\": \"Calle Demo 123\",",
+        "  \"city\": \"{{ciudad}}\",",
+        "  \"latitude\": -37.328,",
+        "  \"longitude\": -59.137",
+        "}"
+      ],
+      "previo": [
+        "const now = Date.now();",
+        "pm.environment.set('run_id', pm.variables.replaceIn('{{$guid}}'));",
+        "pm.environment.set('fecha_evento', new Date(now+8*86400000).toISOString());",
+        "pm.environment.set('desde', new Date(now+7*86400000).toISOString());",
+        "pm.environment.set('hasta', new Date(now+9*86400000).toISOString());",
+        "pm.environment.set('precio', 15000);"
+      ],
+      "verificar": [
+        "pm.environment.set(\"venue_id\", pm.response.json().venueId);"
+      ]
+    },
+    "02-1": {
+      "nombre": "02 Crear participante",
+      "metodo": "POST",
+      "ruta": "/api/v1/participants",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"name\": \"Artista {{run_id}}\",",
+        "  \"role\": \"Banda\"",
+        "}"
+      ],
+      "verificar": [
+        "pm.environment.set(\"participant_id\", pm.response.json().participantId);"
+      ]
+    },
+    "03-1": {
+      "nombre": "03 Crear sector",
+      "metodo": "POST",
+      "ruta": "/api/v1/venues/{{venue_id}}/sectors",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"name\": \"Platea\",",
+        "  \"type\": \"NUMERADO\",",
+        "  \"capacity\": 2,",
+        "  \"rows\": 1,",
+        "  \"seatsPerRow\": 2",
+        "}"
+      ],
+      "verificar": [
+        "pm.environment.set(\"sector_id\", pm.response.json().sectorId);"
+      ]
+    },
+    "04-1": {
+      "nombre": "04 Crear evento borrador",
+      "metodo": "POST",
+      "ruta": "/api/v1/events",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"name\": \"Recital {{run_id}}\",",
+        "  \"description\": \"Demostración Entrega 1\",",
+        "  \"eventType\": \"Recital\",",
+        "  \"organizerId\": {{organizador_id}},",
+        "  \"venueId\": {{venue_id}},",
+        "  \"startDateTime\": \"{{fecha_evento}}\",",
+        "  \"participantIds\": [",
+        "    {{participant_id}}",
+        "  ]",
+        "}"
+      ],
+      "verificar": [
+        "pm.environment.set(\"evento_id\", pm.response.json().eventId);",
+        "pm.test(\"Estado BORRADOR\", () => pm.expect(pm.response.json().status === 'BORRADOR').to.equal(true));"
+      ]
+    },
+    "05-1": {
+      "nombre": "05 Asignar precio a todos los sectores",
+      "metodo": "POST",
+      "ruta": "/api/v1/events/{{evento_id}}/prices",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "[",
+        "  {",
+        "    \"sectorId\": {{sector_id}},",
+        "    \"price\": {{precio}}",
+        "  }",
+        "]"
+      ]
+    },
+    "06-1": {
+      "nombre": "06 Publicar e inicializar inventario",
+      "metodo": "PATCH",
+      "ruta": "/api/v1/events/{{evento_id}}/publish",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Estado PUBLICADO\", () => pm.expect(pm.response.json().status === 'PUBLICADO').to.equal(true));"
+      ]
+    },
+    "07-1": {
+      "nombre": "07 Repetir publicación compatible",
+      "metodo": "PATCH",
+      "ruta": "/api/v1/events/{{evento_id}}/publish",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Estado PUBLICADO\", () => pm.expect(pm.response.json().status === 'PUBLICADO').to.equal(true));"
+      ]
+    },
+    "08-1": {
+      "nombre": "08 Consultar evento",
+      "metodo": "GET",
+      "ruta": "/api/v1/events/{{evento_id}}",
+      "codigos": [
+        200
+      ]
+    },
+    "09-1": {
+      "nombre": "09 Buscar por ciudad tipo participante y fechas",
+      "metodo": "GET",
+      "ruta": "/api/v1/events/search?city={{ciudad}}&type=Recital&participantId={{participant_id}}&fromDate={{desde}}&toDate={{hasta}}&sort=RELEVANCE",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Evento presente en búsqueda\", () => pm.expect(pm.response.json().some(e => String(e.eventId) === String(pm.environment.get(\"evento_id\")))).to.equal(true));"
+      ]
+    },
+    "10-1": {
+      "nombre": "10 Consultar asientos de catálogo (IDs de referencia)",
+      "metodo": "GET",
+      "ruta": "/api/v1/sectors/{{sector_id}}/seats",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Grilla de catálogo con dos asientos\", () => pm.expect(pm.response.json().length === 2).to.equal(true));"
+      ]
+    },
+    "11-1": {
+      "nombre": "11 Consultar disponibilidad y capturar asiento operativo",
+      "metodo": "GET",
+      "ruta": "/disponibilidad/eventos/{{evento_id}}/sectores/{{sector_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Capacidad inicial dos\", () => pm.expect(pm.response.json().disponibles === 2).to.equal(true));",
+        "pm.environment.set('asiento_id', pm.response.json().asientosLibres[0].idAsiento); pm.environment.set('otro_asiento_id', pm.response.json().asientosLibres[1].idAsiento);"
+      ]
+    },
+    "12-1": {
+      "nombre": "12 Reservar selección",
+      "metodo": "POST",
+      "ruta": "/reservas",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"idCliente\": {{cliente_id}},",
+        "  \"idEvento\": {{evento_id}},",
+        "  \"idSector\": {{sector_id}},",
+        "  \"cantidad\": 2,",
+        "  \"idsAsientos\": [",
+        "    {{asiento_id}},",
+        "    {{otro_asiento_id}}",
+        "  ]",
+        "}"
+      ],
+      "verificar": [
+        "pm.environment.set(\"reserva_id\", pm.response.json().idReserva);",
+        "pm.test(\"Reserva pendiente\", () => pm.expect(pm.response.json().estado === 'PENDIENTE').to.equal(true));"
+      ]
+    },
+    "13-1": {
+      "nombre": "13 Consultar reserva",
+      "metodo": "GET",
+      "ruta": "/reservas/{{reserva_id}}",
+      "codigos": [
+        200
+      ]
+    },
+    "14-1": {
+      "nombre": "14 Historial del cliente",
+      "metodo": "GET",
+      "ruta": "/reservas?idCliente={{cliente_id}}",
+      "codigos": [
+        200
+      ]
+    },
+    "15-1": {
+      "nombre": "15 Crear compra con selección exacta",
+      "metodo": "POST",
+      "ruta": "/compras",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"clienteId\": {{cliente_id}},",
+        "  \"eventoId\": {{evento_id}},",
+        "  \"reservaId\": {{reserva_id}},",
+        "  \"detalles\": [",
+        "    {",
+        "      \"sectorId\": {{sector_id}},",
+        "      \"asientoId\": {{asiento_id}},",
+        "      \"cantidad\": 1",
+        "    },",
+        "    {",
+        "      \"sectorId\": {{sector_id}},",
+        "      \"asientoId\": {{otro_asiento_id}},",
+        "      \"cantidad\": 1",
+        "    }",
+        "  ]",
+        "}"
+      ],
+      "previo": [
+        "pm.environment.set('clave_pago', 'pago-'+pm.variables.replaceIn('{{$guid}}'));"
+      ],
+      "verificar": [
+        "pm.environment.set(\"compra_id\", pm.response.json().id);",
+        "pm.environment.set(\"importe\", pm.response.json().importeTotal);"
+      ]
+    },
+    "16-1": {
+      "nombre": "16 Procesar pago",
+      "metodo": "POST",
+      "ruta": "/pagos",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"compraId\": {{compra_id}},",
+        "  \"claveIdempotencia\": \"{{clave_pago}}\",",
+        "  \"medioPago\": \"TARJETA_DEBITO\"",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Resultado financiero esperado\", () => pm.expect(pm.response.json().estado === 'APROBADO').to.equal(true));"
+      ]
+    },
+    "17-1": {
+      "nombre": "17 Repetir pago con la misma clave",
+      "metodo": "POST",
+      "ruta": "/pagos",
+      "codigos": [
+        200
+      ],
+      "cuerpo": [
+        "{",
+        "  \"compraId\": {{compra_id}},",
+        "  \"claveIdempotencia\": \"{{clave_pago}}\",",
+        "  \"medioPago\": \"TARJETA_DEBITO\"",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Resultado financiero esperado\", () => pm.expect(pm.response.json().estado === 'APROBADO').to.equal(true));"
+      ]
+    },
+    "18-1": {
+      "nombre": "18 Consultar compra y su ID local de entrada",
+      "metodo": "GET",
+      "ruta": "/compras/{{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Estado de compra esperado\", () => pm.expect(pm.response.json().estado === 'COMPLETADA').to.equal(true));"
+      ]
+    },
+    "18b-1": {
+      "nombre": "18b Seleccionar entrada por asiento y conocer su ID de devolución",
+      "metodo": "GET",
+      "ruta": "/compras/{{compra_id}}/entradas",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "const units = pm.response.json(); const chosen = units.find(e => String(e.asientoId) === String(pm.environment.get('asiento_id'))) || units[0]; pm.environment.set('entrada_local_id', chosen.entradaId); pm.environment.set('ticket_uuid', chosen.ticketId); pm.environment.set('importe_devolucion', pm.environment.get('precio'));"
+      ]
+    },
+    "19-1": {
+      "nombre": "19 Consultar tickets por orden",
+      "metodo": "GET",
+      "ruta": "/tickets?orderId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Cantidad de tickets esperada\", () => pm.expect(pm.response.json().length === 2).to.equal(true));"
+      ]
+    },
+    "20-1": {
+      "nombre": "20 Consultar pagos sin duplicación",
+      "metodo": "GET",
+      "ruta": "/pagos?compraId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Un solo pago\", () => pm.expect(pm.response.json().length === 1).to.equal(true));"
+      ]
+    },
+    "21-1": {
+      "nombre": "21 Solicitar devolución del asiento elegido",
+      "metodo": "POST",
+      "ruta": "/devoluciones",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"compraId\": {{compra_id}},",
+        "  \"clienteId\": {{cliente_id}},",
+        "  \"entradasIds\": [",
+        "    {{entrada_local_id}}",
+        "  ],",
+        "  \"motivo\": \"No puedo asistir\"",
+        "}"
+      ],
+      "previo": [
+        "pm.environment.set('clave_devolucion', 'devolucion-'+pm.variables.replaceIn('{{$guid}}'));"
+      ],
+      "verificar": [
+        "pm.environment.set(\"devolucion_id\", pm.response.json().id);"
+      ]
+    },
+    "22-1": {
+      "nombre": "22 Consultar solicitudes administrativas",
+      "metodo": "GET",
+      "ruta": "/admin/devoluciones?estado=PENDIENTE",
+      "codigos": [
+        200
+      ]
+    },
+    "23-1": {
+      "nombre": "23 Aprobar sin ejecutar reintegro",
+      "metodo": "POST",
+      "ruta": "/admin/devoluciones/{{devolucion_id}}/aprobar",
+      "codigos": [
+        200
+      ],
+      "cuerpo": [
+        "{",
+        "  \"motivo\": \"Revisión aprobada\"",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Solicitud aprobada\", () => pm.expect(pm.response.json().estado === 'APROBADA').to.equal(true));"
+      ]
+    },
+    "24-1": {
+      "nombre": "24 Procesar devolución",
+      "metodo": "POST",
+      "ruta": "/admin/devoluciones/{{devolucion_id}}/procesar",
+      "codigos": [
+        200
+      ],
+      "cuerpo": [
+        "{",
+        "  \"claveIdempotencia\": \"{{clave_devolucion}}\",",
+        "  \"importe\": {{importe_devolucion}}",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Procesamiento finalizado\", () => pm.expect(pm.response.json().etapa === 'FINALIZADA').to.equal(true));",
+        "pm.test(\"Reintegro por importe histórico\", () => pm.expect(Number(pm.response.json().reintegro.importe) === Number(pm.environment.get(\"importe_devolucion\"))).to.equal(true));",
+        "pm.environment.set(\"reintegro_id\", pm.response.json().reintegro.id);"
+      ]
+    },
+    "25-1": {
+      "nombre": "25 Repetir devolución con misma identidad",
+      "metodo": "POST",
+      "ruta": "/admin/devoluciones/{{devolucion_id}}/procesar",
+      "codigos": [
+        200
+      ],
+      "cuerpo": [
+        "{",
+        "  \"claveIdempotencia\": \"{{clave_devolucion}}\",",
+        "  \"importe\": {{importe_devolucion}}",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Procesamiento finalizado\", () => pm.expect(pm.response.json().etapa === 'FINALIZADA').to.equal(true));",
+        "pm.test(\"Reintegro por importe histórico\", () => pm.expect(Number(pm.response.json().reintegro.importe) === Number(pm.environment.get(\"importe_devolucion\"))).to.equal(true));",
+        "pm.environment.set(\"reintegro_id\", pm.response.json().reintegro.id);"
+      ]
+    },
+    "26-1": {
+      "nombre": "26 Consultar reintegro",
+      "metodo": "GET",
+      "ruta": "/admin/reintegros/{{reintegro_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Reintegro completado\", () => pm.expect(pm.response.json().estado === 'COMPLETADO').to.equal(true));"
+      ]
+    },
+    "27-1": {
+      "nombre": "27 Consultar progreso de devolución",
+      "metodo": "GET",
+      "ruta": "/admin/devoluciones/{{devolucion_id}}/procesamiento",
+      "codigos": [
+        200
+      ]
+    },
+    "28-1": {
+      "nombre": "28 Verificar asiento elegido anulado y otro vigente",
+      "metodo": "GET",
+      "ruta": "/tickets?orderId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Identidad exacta del ticket anulado\", () => pm.expect(pm.response.json().length === 2 && pm.response.json().find(t => t.ticketId === pm.environment.get('ticket_uuid')).status === 'ANULADA' && pm.response.json().filter(t => t.status === 'EMITIDA').length === 1).to.equal(true));"
+      ]
+    },
+    "29-1": {
+      "nombre": "29 Verificar reposición del asiento exacto",
+      "metodo": "GET",
+      "ruta": "/disponibilidad/eventos/{{evento_id}}/sectores/{{sector_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Solo el asiento devuelto vuelve al stock\", () => pm.expect(pm.response.json().disponibles === 1 && pm.response.json().asientosLibres.length === 1 && String(pm.response.json().asientosLibres[0].idAsiento) === String(pm.environment.get('asiento_id'))).to.equal(true));"
+      ]
+    },
+    "30-1": {
+      "nombre": "30 Suspender evento",
+      "metodo": "PATCH",
+      "ruta": "/api/v1/events/{{evento_id}}/suspend",
+      "codigos": [
+        200
+      ],
+      "admin": true,
+      "verificar": [
+        "pm.test(\"Suspendido\", () => pm.expect(pm.response.json().status === 'SUSPENDIDO').to.equal(true));"
+      ]
+    },
+    "31-1": {
+      "nombre": "31 Cancelar evento suspendido",
+      "metodo": "PATCH",
+      "ruta": "/api/v1/events/{{evento_id}}/cancel",
+      "codigos": [
+        200
+      ],
+      "admin": true,
+      "verificar": [
+        "pm.test(\"Cancelado\", () => pm.expect(pm.response.json().status === 'CANCELADO').to.equal(true));"
+      ]
+    },
+    "03-2": {
+      "nombre": "03 Crear sector",
+      "metodo": "POST",
+      "ruta": "/api/v1/venues/{{venue_id}}/sectors",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"name\": \"Campo\",",
+        "  \"type\": \"NO_NUMERADO\",",
+        "  \"capacity\": 2",
+        "}"
+      ],
+      "verificar": [
+        "pm.environment.set(\"sector_id\", pm.response.json().sectorId);"
+      ]
+    },
+    "11-2": {
+      "nombre": "11 Consultar disponibilidad y capturar asiento operativo",
+      "metodo": "GET",
+      "ruta": "/disponibilidad/eventos/{{evento_id}}/sectores/{{sector_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Capacidad inicial dos\", () => pm.expect(pm.response.json().disponibles === 2).to.equal(true));"
+      ]
+    },
+    "12-2": {
+      "nombre": "12 Reservar selección",
+      "metodo": "POST",
+      "ruta": "/reservas",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"idCliente\": {{cliente_id}},",
+        "  \"idEvento\": {{evento_id}},",
+        "  \"idSector\": {{sector_id}},",
+        "  \"cantidad\": 1,",
+        "  \"idsAsientos\": null",
+        "}"
+      ],
+      "verificar": [
+        "pm.environment.set(\"reserva_id\", pm.response.json().idReserva);",
+        "pm.test(\"Reserva pendiente\", () => pm.expect(pm.response.json().estado === 'PENDIENTE').to.equal(true));"
+      ]
+    },
+    "15-2": {
+      "nombre": "15 Crear compra con selección exacta",
+      "metodo": "POST",
+      "ruta": "/compras",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"clienteId\": {{cliente_id}},",
+        "  \"eventoId\": {{evento_id}},",
+        "  \"reservaId\": {{reserva_id}},",
+        "  \"detalles\": [",
+        "    {",
+        "      \"sectorId\": {{sector_id}},",
+        "      \"asientoId\": null,",
+        "      \"cantidad\": 1",
+        "    }",
+        "  ]",
+        "}"
+      ],
+      "previo": [
+        "pm.environment.set('clave_pago', 'pago-'+pm.variables.replaceIn('{{$guid}}'));"
+      ],
+      "verificar": [
+        "pm.environment.set(\"compra_id\", pm.response.json().id);",
+        "pm.environment.set(\"importe\", pm.response.json().importeTotal);"
+      ]
+    },
+    "19-2": {
+      "nombre": "19 Consultar tickets por orden",
+      "metodo": "GET",
+      "ruta": "/tickets?orderId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Cantidad de tickets esperada\", () => pm.expect(pm.response.json().length === 1).to.equal(true));"
+      ]
+    },
+    "21-2": {
+      "nombre": "21 Cancelar con venta",
+      "metodo": "PATCH",
+      "ruta": "/api/v1/events/{{evento_id}}/cancel",
+      "codigos": [
+        200
+      ],
+      "admin": true,
+      "verificar": [
+        "pm.test(\"Cancelado\", () => pm.expect(pm.response.json().status === 'CANCELADO').to.equal(true));"
+      ]
+    },
+    "22-2": {
+      "nombre": "22 Repetir cancelación",
+      "metodo": "PATCH",
+      "ruta": "/api/v1/events/{{evento_id}}/cancel",
+      "codigos": [
+        200
+      ],
+      "admin": true,
+      "verificar": [
+        "pm.test(\"Cancelado\", () => pm.expect(pm.response.json().status === 'CANCELADO').to.equal(true));"
+      ]
+    },
+    "23-2": {
+      "nombre": "23 Verificar anulación",
+      "metodo": "GET",
+      "ruta": "/tickets?orderId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Ticket anulado\", () => pm.expect(pm.response.json().length === 1 && pm.response.json()[0].status === 'ANULADA').to.equal(true));"
+      ]
+    },
+    "24-2": {
+      "nombre": "24 Verificar reintegro total sin duplicación",
+      "metodo": "GET",
+      "ruta": "/pagos?compraId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Reintegro total una sola vez\", () => pm.expect(pm.response.json().length === 1 && pm.response.json()[0].estado === \"REINTEGRADO_TOTAL\" && Number(pm.response.json()[0].importeReintegrado) === Number(pm.environment.get(\"importe\"))).to.equal(true));"
+      ]
+    },
+    "25-2": {
+      "nombre": "25 Verificar inventario bloqueado",
+      "metodo": "GET",
+      "ruta": "/disponibilidad/eventos/{{evento_id}}/sectores/{{sector_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Sin reoferta de stock\", () => pm.expect(pm.response.json().disponibles === 0).to.equal(true));"
+      ]
+    },
+    "01-3": {
+      "nombre": "01 Crear lugar nuevo",
+      "metodo": "POST",
+      "ruta": "/api/v1/venues",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"name\": \"Sala {{run_id}}\",",
+        "  \"address\": \"Calle Demo 123\",",
+        "  \"city\": \"{{ciudad}}\",",
+        "  \"latitude\": -37.328,",
+        "  \"longitude\": -59.137",
+        "}"
+      ],
+      "previo": [
+        "const now = Date.now();",
+        "pm.environment.set('run_id', pm.variables.replaceIn('{{$guid}}'));",
+        "pm.environment.set('fecha_evento', new Date(now+8*86400000).toISOString());",
+        "pm.environment.set('desde', new Date(now+7*86400000).toISOString());",
+        "pm.environment.set('hasta', new Date(now+9*86400000).toISOString());",
+        "pm.environment.set('precio', 150000);"
+      ],
+      "verificar": [
+        "pm.environment.set(\"venue_id\", pm.response.json().venueId);"
+      ]
+    },
+    "16-3": {
+      "nombre": "16 Procesar pago",
+      "metodo": "POST",
+      "ruta": "/pagos",
+      "codigos": [
+        201
+      ],
+      "cuerpo": [
+        "{",
+        "  \"compraId\": {{compra_id}},",
+        "  \"claveIdempotencia\": \"{{clave_pago}}\",",
+        "  \"medioPago\": \"TARJETA_DEBITO\"",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Resultado financiero esperado\", () => pm.expect(pm.response.json().estado === 'RECHAZADO').to.equal(true));"
+      ]
+    },
+    "17-3": {
+      "nombre": "17 Repetir pago con la misma clave",
+      "metodo": "POST",
+      "ruta": "/pagos",
+      "codigos": [
+        200
+      ],
+      "cuerpo": [
+        "{",
+        "  \"compraId\": {{compra_id}},",
+        "  \"claveIdempotencia\": \"{{clave_pago}}\",",
+        "  \"medioPago\": \"TARJETA_DEBITO\"",
+        "}"
+      ],
+      "verificar": [
+        "pm.test(\"Resultado financiero esperado\", () => pm.expect(pm.response.json().estado === 'RECHAZADO').to.equal(true));"
+      ]
+    },
+    "18-3": {
+      "nombre": "18 Consultar compra y su ID local de entrada",
+      "metodo": "GET",
+      "ruta": "/compras/{{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Estado de compra esperado\", () => pm.expect(pm.response.json().estado === 'FALLIDA').to.equal(true));"
+      ]
+    },
+    "19-3": {
+      "nombre": "19 Consultar tickets por orden",
+      "metodo": "GET",
+      "ruta": "/tickets?orderId={{compra_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Cantidad de tickets esperada\", () => pm.expect(pm.response.json().length === 0).to.equal(true));"
+      ]
+    },
+    "21-3": {
+      "nombre": "21 Verificar stock liberado",
+      "metodo": "GET",
+      "ruta": "/disponibilidad/eventos/{{evento_id}}/sectores/{{sector_id}}",
+      "codigos": [
+        200
+      ],
+      "verificar": [
+        "pm.test(\"Stock inicial restituido\", () => pm.expect(pm.response.json().disponibles === 2).to.equal(true));"
+      ]
+    }
+  }
+}

@@ -20,7 +20,7 @@ Referencia: lectura completa de las cinco páginas del enunciado `TPE-ArqWeb-Tic
 | API REST documentada | [Cinco contratos OpenAPI](openapi/README.md), públicos e internos diferenciados |
 | Gateway integrado | Arquitectura, rutas reales y OpenAPI Gateway |
 | Ejecución y demostración | [README](../../README.md), Postman y esquemas nuevos |
-| Pruebas y escenarios de integración | [Evidencia y procedimiento seguro](pruebas.md) |
+| Pruebas y escenarios de integración | [JUnit y validación HTTP del último cupo con dos JVM de Inventario](pruebas.md) |
 
 El enunciado contempla una evolución posterior del proyecto. Este paquete desarrolla las historias y diseños de Entrega 1: no presenta autenticación JWT, validación de ingreso/uso único del QR, reportes, notificaciones, persistencia NoSQL ni infraestructura de Entrega 2 como implementados.
 

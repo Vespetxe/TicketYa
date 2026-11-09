@@ -6,6 +6,10 @@ const assert = require('node:assert/strict');
 const {randomUUID,createHash} = require('node:crypto');
 
 async function main() {
+  const runId = process.env.TICKETYA_RUN_ID || randomUUID().replaceAll('-', '');
+  assert(/^[a-f0-9]{32}$/.test(runId), 'Identificador de corrida inválido');
+  const out = path.join(__dirname, 'target', 'runs', runId);
+  fs.mkdirSync(out, {recursive:true});
   const offset = Number(process.env.TICKETYA_TEST_PORT_OFFSET || 0);
   assert([0,10000].includes(offset), 'Red de prueba no permitida');
   const token = process.env.TICKETYA_TEST_TOKEN || '';
@@ -16,7 +20,7 @@ async function main() {
     compras:{eventos:18081,inventario:18082,entradas:18083},entradas:{compras:18084}
   };
   for (const [service,port] of Object.entries({gateway:18080,eventos:18081,inventario:18082,entradas:18083,compras:18084,inventario2:18085})) {
-    const response=await fetch(`http://127.0.0.1:${port+offset}/internal/test-environment`, {headers:{'X-TicketYa-Test-Token':token},signal:AbortSignal.timeout(5000)});
+    const response=await fetch(`http://127.0.0.1:${port+offset}/internal/test-environment`, {redirect:'error',headers:{'X-TicketYa-Test-Token':token},signal:AbortSignal.timeout(5000)});
     assert.equal(response.status,200,`Acreditacion ${service}`);
     const data=await response.json(), name=service==='inventario2'?'inventario':service;
     assert.equal(data.service,name);
@@ -45,7 +49,7 @@ async function main() {
       const headers=Object.fromEntries(request.header.filter(h=>!h.disabled).map(h=>[h.key,replace(h.value)]));
       const url=replace(request.url);
       assert(url.startsWith(values.get('base_url')+'/'),'Destino de negocio no aislado');
-      response=await fetch(url,{method:request.method,headers,body:request.body?replace(request.body.raw):undefined,signal:AbortSignal.timeout(20000)});
+      response=await fetch(url,{method:request.method,redirect:'error',headers,body:request.body?replace(request.body.raw):undefined,signal:AbortSignal.timeout(20000)});
       body=await response.text();requests++;
       pm.response={code:response.status,json:()=>JSON.parse(body)};
       try{for(const event of item.event||[])if(event.listen==='test')new Function('pm',event.script.exec.join('\n'))(pm);}
@@ -54,7 +58,7 @@ async function main() {
     }
   }
   const report={executed_at:new Date().toISOString(),runner:'Node; API pm limitada a la usada por la coleccion, no Postman/Newman',collection_sha256:createHash('sha256').update(rawCollection).digest('hex'),gateway:values.get('base_url'),requests,checks,failures:0,results};
-  fs.writeFileSync(path.join(__dirname,'astra-postman-results.json'),JSON.stringify(report,null,2)+'\n');
+  fs.writeFileSync(path.join(out,'postman.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx'});
   console.log(`OK: ${requests} solicitudes, ${checks} aserciones; seis procesos acreditados antes del primer POST`);
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

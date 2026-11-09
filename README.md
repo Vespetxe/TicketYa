@@ -10,8 +10,8 @@ La [documentación de Entrega 1](docs/entrega1/README.md) reúne historias, acep
 - Maven 3.9 o posterior disponible como `mvn`; Gateway requiere Maven instalado. Los otros proyectos también incluyen wrapper.
 - MySQL 8.4 recomendado; usuario con permisos sobre cuatro esquemas nuevos. Hibernate crea/actualiza tablas al arrancar.
 - PowerShell para copiar los comandos de esta guía; equivalentes de variables de entorno en otra shell.
-- Postman opcional para demostración. Python 3 y Docker opcionales para pruebas aisladas.
-- Acceso al repositorio Maven al descargar dependencias por primera vez. No se requiere Node, frontend ni Docker Compose.
+- Node.js para validar los scripts de la colección. Docker con MySQL 8.4 y PowerShell 7 para la corrida aislada completa. Postman es opcional para la demostración.
+- Acceso al repositorio Maven al descargar dependencias por primera vez. El arranque de los microservicios requiere Java y MySQL.
 
 Comprobar `java -version` y `mvn -version` antes de arrancar. Cada proyecto tiene su propio `pom.xml`: no hay un reactor Maven en la raíz.
 
@@ -120,7 +120,7 @@ Las carpetas cubren compra numerada aprobada y devolución; compra general y can
 
 El entorno normal anterior es distinto del entorno de prueba. No ejecutar escenarios integrales contra 8080 ni reutilizar sus esquemas. Las pruebas de Compras requieren MySQL desechable en 33079; los escenarios HTTP requieren otra instancia en 33479, esquemas exactos `ticketya_e1_*`, perfil `pruebas-integrales`, token aleatorio y puertos 18080–18085. La acreditación verifica la BD efectiva y destinos antes de escribir; un simple indicador booleano no basta.
 
-El [procedimiento completo de pruebas](docs/entrega1/pruebas.md) incluye creación de entornos, comandos Maven/Python, TTL corto y resultados registrados anteriormente. El cierre posterior de los hallazgos de Astra ejecutó pruebas aisladas y la colección en la red nueva 28080–28085/33489, sin alterar procesos normales. La evidencia y sus condiciones están consolidadas en la guía de pruebas.
+Las pruebas de Entrega 1 se ejecutan con Java 21 y Maven. La guía incluye el comando de la corrida completa, la acreditación de los seis procesos y la ubicación de los informes locales. [Procedimiento de pruebas](docs/entrega1/pruebas.md).
 
 ## Problemas frecuentes
 

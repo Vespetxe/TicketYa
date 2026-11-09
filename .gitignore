@@ -1,15 +1,12 @@
-# Builds y recursos temporales; los target ya versionados requieren revision futura.
+# Builds e informes locales de Maven, JUnit y Postman.
 **/target/
 **/src.rar
 **/__pycache__/
 *.py[cod]
 .idea/
 **/*.log
-# Evidencia seleccionada, sin secretos; no son logs de arranque con configuracion.
-!TicketYa/integration-tests/close-run.log
-!TicketYa/integration-tests/astra-run.log
-!TicketYa/integration-tests/astra-postman.log
-!TicketYa/integration-tests/astra-isolation-python.log
+/TicketYa/integration-tests/*-results.json
+/docs/entrega1/verificacion-documental.json
 **/.env
 **/.env.*
 !**/.env.example
