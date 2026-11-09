@@ -28,6 +28,9 @@ class InventarioServiceTest {
 
     @Mock
     private AsientoRepository asientoRepository;
+    @Mock private DevolucionInventarioService devoluciones;
+    @Mock private ControlEventoService control;
+    @Mock private example.microservicio_inventario_reservas.repositories.ReservaRepository reservas;
 
     @InjectMocks
     private InventarioService inventarioService;
@@ -38,7 +41,7 @@ class InventarioServiceTest {
         // ARRANGE
         Long idEvento = 1L;
         AsientoDTO asientoDTO = new AsientoDTO("A", 10);
-        InicializarInventarioRequest request = new InicializarInventarioRequest(2L, true, 50, List.of(asientoDTO));
+        InicializarInventarioRequest request = new InicializarInventarioRequest(2L, true, 1, List.of(asientoDTO));
 
         when(inventarioSectorRepository.findByIdEventoAndIdSector(idEvento, 2L))
                 .thenReturn(Optional.empty());
@@ -123,29 +126,17 @@ class InventarioServiceTest {
     void liberarPorDevolucion_Exito() {
         // ARRANGE
         LiberarDevolucionRequest request = new LiberarDevolucionRequest(1L, 2L, 2, List.of(10L, 11L));
-
-        InventarioSector inventario = new InventarioSector();
-        inventario.setEsNumerado(true);
-
-        Asiento asiento10 = new Asiento();
-        asiento10.setIdAsiento(10L);
-
-        Asiento asiento11 = new Asiento();
-        asiento11.setIdAsiento(11L);
-
-        when(inventarioSectorRepository.findByIdEventoAndIdSector(1L, 2L))
-                .thenReturn(Optional.of(inventario));
-
-        // Mocks para evitar la excepción en el for(Long id : request.getIdsAsientos())
-        when(asientoRepository.findById(10L)).thenReturn(Optional.of(asiento10));
-        when(asientoRepository.findById(11L)).thenReturn(Optional.of(asiento11));
+        request.setIdReserva(9L); request.setEntradasIds(List.of("ticket-1","ticket-2"));
+        var reserva=new example.microservicio_inventario_reservas.entities.Reserva();
+        reserva.setIdEvento(1L); reserva.setIdSector(2L);
+        when(reservas.buscarConBloqueo(9L)).thenReturn(Optional.of(reserva));
 
         // ACT
         MensajeResponse response = inventarioService.liberarPorDevolucion(request);
 
         // ASSERT
         assertTrue(response.isExitoso());
-        verify(asientoRepository, times(1)).actualizarEstadoAsientos(List.of(10L, 11L), EstadoAsiento.LIBRE);
-        verify(inventarioSectorRepository, times(1)).incrementarDisponibilidad(1L, 2L, 2);
+        verify(devoluciones).devolver(9L,new DevolverLugaresRequest(List.of(
+                new DevolverLugaresRequest.Unidad("ticket-1",10L),new DevolverLugaresRequest.Unidad("ticket-2",11L))));
     }
 }

@@ -80,6 +80,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public List<EventSectorPriceResponseDTO> setSectorPrices(Long eventId, List<EventSectorPriceRequestDTO> prices) {
+        if(prices==null || prices.isEmpty())throw new BusinessRuleException("Se requieren precios");
+        Set<Long> incoming=new HashSet<>();
+        for(var p:prices)if(p==null || p.getSectorId()==null || !incoming.add(p.getSectorId()) || p.getPrice()==null || p.getPrice().signum()<=0)
+            throw new BusinessRuleException("Precios invalidos o sectores repetidos");
         Event event = findEventOrThrow(eventId);
 
         if (event.getStatus() != EventStatus.BORRADOR) {
@@ -99,7 +103,7 @@ public class EventServiceImpl implements EventService {
                     .orElseGet(() -> new EventSectorPrice(event, priceDto.getSectorId(), priceDto.getPrice()));
 
             sectorPrice.setPrice(priceDto.getPrice());
-            event.addSectorPrice(sectorPrice);
+            if(!event.getSectorPrices().contains(sectorPrice))event.addSectorPrice(sectorPrice);
         }
 
         eventRepository.save(event);
@@ -113,6 +117,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventResponseDTO publishEvent(Long eventId) {
         Event event = findEventOrThrow(eventId);
+        if(event.getStartDateTime()==null || !event.getStartDateTime().isAfter(java.time.OffsetDateTime.now()))
+            throw new BusinessRuleException("El evento debe comenzar en el futuro");
 
         // Validar Máquina de Estados: BORRADOR -> PUBLICADO
         if (event.getStatus() != EventStatus.BORRADOR) {
@@ -121,6 +127,7 @@ public class EventServiceImpl implements EventService {
 
         // Regla de Negocio: Todos los sectores del lugar deben tener precio asignado
         List<Sector> venueSectors = sectorRepository.findByVenueVenueId(event.getVenueId());
+        if(venueSectors.isEmpty())throw new BusinessRuleException("El lugar requiere sectores");
         Set<Long> configuredPriceSectorIds = event.getSectorPrices().stream()
                 .map(EventSectorPrice::getSectorId)
                 .collect(Collectors.toSet());
@@ -163,6 +170,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventResponseDTO suspendOrUpdateStatus(Long eventId, String newStatusStr, String userRole) {
+        if(!"ADMIN".equalsIgnoreCase(userRole)) throw new BusinessRuleException("Se requiere identificar administrador");
         Event event = findEventOrThrow(eventId);
         EventStatus newStatus;
 
@@ -185,17 +193,17 @@ public class EventServiceImpl implements EventService {
 
         switch (currentStatus) {
             case BORRADOR -> {
-                if (newStatus != EventStatus.PUBLICADO && newStatus != EventStatus.CANCELADO) {
+                if (newStatus != EventStatus.SUSPENDIDO && newStatus != EventStatus.PUBLICADO && newStatus != EventStatus.CANCELADO) {
                     throw new BusinessRuleException("Un evento en BORRADOR solo puede pasar a PUBLICADO o CANCELADO");
                 }
             }
-            case PUBLICADO -> {
-                if (newStatus != EventStatus.AGOTADO && newStatus != EventStatus.CANCELADO && newStatus != EventStatus.FINALIZADO) {
+            case PUBLICADO, SUSPENDIDO -> {
+                if (newStatus != EventStatus.SUSPENDIDO && newStatus != EventStatus.PUBLICADO && newStatus != EventStatus.AGOTADO && newStatus != EventStatus.CANCELADO && newStatus != EventStatus.FINALIZADO) {
                     throw new BusinessRuleException("Un evento PUBLICADO solo puede pasar a AGOTADO, CANCELADO o FINALIZADO");
                 }
             }
             case AGOTADO -> {
-                if (newStatus != EventStatus.PUBLICADO && newStatus != EventStatus.CANCELADO && newStatus != EventStatus.FINALIZADO) {
+                if (newStatus != EventStatus.SUSPENDIDO && newStatus != EventStatus.PUBLICADO && newStatus != EventStatus.CANCELADO && newStatus != EventStatus.FINALIZADO) {
                     throw new BusinessRuleException("Un evento AGOTADO solo puede reabrirse a PUBLICADO, CANCELADO o FINALIZADO");
                 }
             }

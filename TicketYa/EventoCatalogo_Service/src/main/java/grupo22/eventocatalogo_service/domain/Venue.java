@@ -10,6 +10,9 @@ import java.util.List;
 @Entity
 @Table(name = "venue")
 public class Venue {
+    private String city;
+    public String getCity() {return city;}
+    public void setCity(String city) {this.city=city;}
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

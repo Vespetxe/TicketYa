@@ -1,0 +1,55 @@
+erDiagram
+    event {
+        bigint event_id PK "required"
+        text description "nullable"
+        varchar event_type "required"
+        varchar name "required"
+        bigint organizer_id "required"
+        datetime start_date_time "required"
+        enum status "required"
+        bigint venue_id "required"
+        bigint version "required"
+    }
+    event_participant {
+        bigint event_id PK,FK "required"
+        bigint participant_id PK,FK "required"
+    }
+    event_sector_price {
+        bigint event_sector_price_id PK "required"
+        decimal price "required"
+        bigint sector_id "required"
+        bigint event_id FK "required"
+    }
+    participant {
+        bigint participant_id PK "required"
+        varchar name "required"
+        varchar role "nullable"
+    }
+    seat {
+        bigint seat_id PK "required"
+        varchar row_label "required"
+        int seat_number "required"
+        bigint sector_id FK "required"
+    }
+    sector {
+        bigint sector_id PK "required"
+        int capacity "required"
+        datetime created_at "required"
+        varchar name "required"
+        enum type "required"
+        bigint venue_id FK "required"
+    }
+    venue {
+        bigint venue_id PK "required"
+        varchar address "required"
+        varchar city "nullable"
+        datetime created_at "required"
+        decimal latitude "required"
+        decimal longitude "required"
+        varchar name "required"
+    }
+    participant ||--o{ event_participant : "participant_id"
+    event ||--o{ event_participant : "event_id"
+    event ||--o{ event_sector_price : "event_id"
+    sector ||--o{ seat : "sector_id"
+    venue ||--o{ sector : "venue_id"

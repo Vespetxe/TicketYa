@@ -1,0 +1,94 @@
+erDiagram
+    compra_entradas {
+        bigint compra_id FK "required"
+        bigint entrada_id PK,UK "required"
+    }
+    compras {
+        bigint id PK "required"
+        datetime bloqueo_hasta "nullable"
+        bit cancelacion_solicitada "required"
+        bigint cliente_id "required"
+        varchar ejecutor "nullable"
+        enum estado "required"
+        enum etapa "required"
+        bigint evento_id "required"
+        datetime fecha_creacion "required"
+        decimal importe_total "required"
+        bigint reserva_id UK "required"
+        datetime reserva_vencimiento "nullable"
+        bigint version "required"
+    }
+    control_limite_entradas {
+        bigint id PK "required"
+        bigint cliente_id "required"
+        bigint evento_id "required"
+    }
+    detalles_compra {
+        bigint id PK "required"
+        bigint asiento_id "nullable"
+        int cantidad "required"
+        decimal precio_unitario "required"
+        bigint sector_id "required"
+        decimal subtotal "required"
+        bigint compra_id FK "required"
+    }
+    detalles_devolucion {
+        bigint id PK "required"
+        bigint entrada_id "required"
+        decimal importe "required"
+        bigint detalle_compra_id FK "required"
+        bigint devolucion_id FK "required"
+    }
+    devoluciones {
+        bigint id PK "required"
+        bit cancelacion_evento "required"
+        enum estado "required"
+        enum etapa "nullable"
+        datetime fecha_resolucion "nullable"
+        datetime fecha_solicitud "required"
+        decimal importe_reintegrado "required"
+        decimal importe_solicitado "required"
+        varchar motivo "required"
+        varchar motivo_rechazo "nullable"
+        varchar motivo_resolucion "nullable"
+        bigint compra_id FK "required"
+    }
+    entrada_externa {
+        bigint id PK "required"
+        varchar uuid UK "required"
+    }
+    operaciones_simuladas {
+        varchar clave PK "required"
+        longtext datos "nullable"
+    }
+    pagos {
+        bigint id PK "required"
+        varchar clave_idempotencia UK "required"
+        enum estado "required"
+        datetime fecha_creacion "required"
+        datetime fecha_procesamiento "nullable"
+        decimal importe "required"
+        decimal importe_reintegrado "required"
+        enum medio_pago "nullable"
+        varchar referencia_externa "nullable"
+        varchar referencia_reintegro "nullable"
+        bigint compra_id FK "required"
+    }
+    reintegros {
+        bigint id PK "required"
+        varchar clave_idempotencia UK "required"
+        enum estado "required"
+        datetime fecha_procesamiento "nullable"
+        decimal importe "required"
+        varchar referencia_externa "nullable"
+        bigint devolucion_id FK "nullable"
+        bigint pago_id FK "required"
+    }
+    compras ||--o{ compra_entradas : "compra_id"
+    compras ||--o{ detalles_compra : "compra_id"
+    devoluciones ||--o{ detalles_devolucion : "devolucion_id"
+    detalles_compra ||--o{ detalles_devolucion : "detalle_compra_id"
+    compras ||--o{ devoluciones : "compra_id"
+    compras ||--o{ pagos : "compra_id"
+    pagos ||--o{ reintegros : "pago_id"
+    devoluciones |o--o{ reintegros : "devolucion_id"

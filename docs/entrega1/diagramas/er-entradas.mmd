@@ -1,0 +1,23 @@
+erDiagram
+    emission_event_gate {
+        varchar event_id PK "required"
+        bit cancelled "required"
+    }
+    ticket_batches {
+        bigint id PK "required"
+        bit cancelled "required"
+        datetime issued_at "required"
+        varchar order_id UK "required"
+    }
+    tickets {
+        varchar ticket_id PK "required"
+        varchar client_id "required"
+        varchar event_id "required"
+        varchar qr_payload UK "required"
+        varchar seat_id "nullable"
+        varchar sector_id "required"
+        enum status "required"
+        bigint version "required"
+        bigint batch_id FK "required"
+    }
+    ticket_batches ||--o{ tickets : "batch_id"

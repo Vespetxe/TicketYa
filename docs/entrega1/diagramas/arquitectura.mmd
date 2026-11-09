@@ -1,0 +1,21 @@
+flowchart LR
+    C[Cliente o administrador] -->|REST JSON| G[API Gateway 8080]
+    G -->|REST| E[Eventos y Catalogo 8081]
+    G -->|REST| I[Inventario y Reservas 8082]
+    G -->|REST| P[Compras y Pagos 8084]
+    G -->|GET tickets| T[Entradas 8083]
+    E -->|Preparar habilitar y bloquear stock| I
+    E -->|Barrera de emision| T
+    E -->|Coordinar cancelacion| P
+    P -->|Consultar evento y precios| E
+    P -->|Verificar confirmar compensar| I
+    P -->|Emitir y anular| T
+    T -->|Consultar orden habilitada| P
+    E --- ED[(BD Eventos)]
+    I --- ID[(BD Inventario)]
+    T --- TD[(BD Entradas)]
+    subgraph CP[Proceso Compras]
+        P --> PS[Adaptador pasarela simulada]
+        PS --- PD[(BD Compras y diario de efectos)]
+        P --- PD
+    end

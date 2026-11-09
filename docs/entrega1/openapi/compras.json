@@ -1,0 +1,4370 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TicketYa - compras - Entrega 1",
+    "version": "entrega-1",
+    "description": "Contrato documental del codigo actual; coordinacion interna diferenciada. Identificacion declarada, sin JWT."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8084"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Compras",
+      "description": "API para la creación y consulta de compras"
+    },
+    {
+      "name": "Pagos",
+      "description": "API para el procesamiento de pagos de compras"
+    },
+    {
+      "name": "Devoluciones",
+      "description": "Solicitudes del cliente. Integracion futura: autenticar titular y autorizar la consulta."
+    },
+    {
+      "name": "Administracion de devoluciones",
+      "description": "Requiere autorizacion administrativa en la futura integracion. Esta entrega no implementa seguridad."
+    }
+  ],
+  "paths": {
+    "/pagos": {
+      "get": {
+        "tags": [
+          "Pagos"
+        ],
+        "summary": "Consultar pagos de una compra",
+        "description": "Devuelve todos los pagos registrados para la compra indicada. Accesible por el Gateway.",
+        "operationId": "compras_get_pagos",
+        "parameters": [
+          {
+            "name": "compraId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta realizada correctamente. Puede devolver una lista vacía.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PagoDTO"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "compraId": 1,
+                    "claveIdempotencia": "ejemplo",
+                    "importe": 1,
+                    "importeReintegrado": 1,
+                    "estado": "PENDIENTE",
+                    "fechaCreacion": "2030-12-01T21:00:00",
+                    "fechaProcesamiento": "2030-12-01T21:00:00",
+                    "referenciaExterna": "ejemplo",
+                    "referenciaReintegro": "ejemplo",
+                    "medioPago": "TARJETA_CREDITO"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro compraId ausente o inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      },
+      "post": {
+        "tags": [
+          "Pagos"
+        ],
+        "summary": "Procesar un pago",
+        "description": "Registra el intento de pago. Exige medioPago para pagos nuevos; repetir requiere la misma compra, clave y medio. Solo los pagos historicos sin medio permiten omitirlo. 201 no implica aprobacion: consultar estado del resultado. Accesible por el Gateway.",
+        "operationId": "compras_post_pagos",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcesarPagoDTO"
+              },
+              "example": {
+                "compraId": 1,
+                "claveIdempotencia": "pago-demo-1",
+                "medioPago": "TARJETA_DEBITO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Pago creado correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagoDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "claveIdempotencia": "ejemplo",
+                  "importe": 1,
+                  "importeReintegrado": 1,
+                  "estado": "PENDIENTE",
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "fechaProcesamiento": "2030-12-01T21:00:00",
+                  "referenciaExterna": "ejemplo",
+                  "referenciaReintegro": "ejemplo",
+                  "medioPago": "TARJETA_CREDITO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Pago existente recuperado por idempotencia",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagoDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "claveIdempotencia": "ejemplo",
+                  "importe": 1,
+                  "importeReintegrado": 1,
+                  "estado": "PENDIENTE",
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "fechaProcesamiento": "2030-12-01T21:00:00",
+                  "referenciaExterna": "ejemplo",
+                  "referenciaReintegro": "ejemplo",
+                  "medioPago": "TARJETA_CREDITO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos, compra o reserva incorrecta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con un pago existente o en procesamiento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 415,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/devoluciones": {
+      "post": {
+        "tags": [
+          "Devoluciones"
+        ],
+        "summary": "Solicitar devolucion de entradas",
+        "description": "Anticipacion minima 72 horas UTC. No genera reintegros automaticamente. Accesible por el Gateway.",
+        "operationId": "compras_post_devoluciones",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolicitarDevolucionDTO"
+              },
+              "example": {
+                "compraId": 1,
+                "clienteId": 1,
+                "entradasIds": [
+                  1
+                ],
+                "motivo": "No puedo asistir"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o solicitud incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Solicitud pendiente registrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevolucionDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "fechaSolicitud": "2030-12-01T21:00:00",
+                  "estado": "PENDIENTE",
+                  "motivo": "ejemplo",
+                  "motivoResolucion": "ejemplo",
+                  "motivoRechazo": "ejemplo",
+                  "fechaResolucion": "2030-12-01T21:00:00",
+                  "importeSolicitado": 1,
+                  "importeReintegrado": 1,
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "detalleCompraId": 1,
+                      "entradaId": 1,
+                      "importe": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 415,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/compras": {
+      "get": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Consultar compras de un cliente",
+        "description": "Devuelve todas las compras registradas para el cliente indicado. Accesible por el Gateway.",
+        "operationId": "compras_get_compras",
+        "parameters": [
+          {
+            "name": "clienteId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta realizada correctamente. Puede devolver una lista vacía.",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompraDTO"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "clienteId": 1,
+                    "eventoId": 1,
+                    "reservaId": 1,
+                    "fechaCreacion": "2030-12-01T21:00:00",
+                    "importeTotal": 1,
+                    "estado": "PENDIENTE",
+                    "detalles": [
+                      {
+                        "id": 1,
+                        "sectorId": 1,
+                        "asientoId": 1,
+                        "cantidad": 1,
+                        "precioUnitario": 1,
+                        "subtotal": 1
+                      }
+                    ],
+                    "etapa": "PAGO",
+                    "entradasIds": [
+                      1
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro clienteId ausente o inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      },
+      "post": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Crear una compra",
+        "description": "Valida el evento y la reserva, verifica el límite de entradas por cliente y calcula el importe total. Accesible por el Gateway.",
+        "operationId": "compras_post_compras",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearCompraDTO"
+              },
+              "example": {
+                "clienteId": 1,
+                "eventoId": 1,
+                "reservaId": 1,
+                "detalles": [
+                  {
+                    "sectorId": 1,
+                    "asientoId": 1,
+                    "cantidad": 1
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Compra creada correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "reservaId": 1,
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "importeTotal": 1,
+                  "estado": "PENDIENTE",
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "sectorId": 1,
+                      "asientoId": 1,
+                      "cantidad": 1,
+                      "precioUnitario": 1,
+                      "subtotal": 1
+                    }
+                  ],
+                  "etapa": "PAGO",
+                  "entradasIds": [
+                    1
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos, reserva incorrecta o límite de entradas excedido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 415,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/compras/{id}/cancelar": {
+      "post": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Cancelar una compra pendiente",
+        "description": "Registra la cancelacion e impide nuevos pagos. Repetir recupera la liberacion de reserva pendiente sin duplicar efectos. Accesible por el Gateway.",
+        "operationId": "compras_post_compras_id_cancelar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelacion registrada; consultar etapa para verificar liberacion",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "reservaId": 1,
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "importeTotal": 1,
+                  "estado": "PENDIENTE",
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "sectorId": 1,
+                      "asientoId": 1,
+                      "cantidad": 1,
+                      "precioUnitario": 1,
+                      "subtotal": 1
+                    }
+                  ],
+                  "etapa": "PAGO",
+                  "entradasIds": [
+                    1
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Identificador invalido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Compra inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Compra en procesamiento, completada o fallida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/admin/eventos/{id}/cancelacion": {
+      "post": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Recuperar cancelacion de evento confirmada por Eventos",
+        "description": "El cliente real comprueba CANCELADO en Eventos, recupera pagos en procesamiento con su clave original y reintegra ventas. 202 conserva compras pendientes si una dependencia o turno impide finalizar; repetir. Preferir PATCH /api/v1/events/{eventId}/cancel para iniciar el flujo completo. Accesible por el Gateway.",
+        "operationId": "compras_post_admin_eventos_id_cancelacion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelacion procesada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelacionEventoDTO"
+                },
+                "example": {
+                  "eventoId": 1,
+                  "devoluciones": [
+                    {
+                      "devolucion": {
+                        "id": 1,
+                        "compraId": 1,
+                        "clienteId": 1,
+                        "eventoId": 1,
+                        "fechaSolicitud": "2030-12-01T21:00:00",
+                        "estado": "PENDIENTE",
+                        "motivo": "ejemplo",
+                        "motivoResolucion": "ejemplo",
+                        "motivoRechazo": "ejemplo",
+                        "fechaResolucion": "2030-12-01T21:00:00",
+                        "importeSolicitado": 1,
+                        "importeReintegrado": 1,
+                        "detalles": [
+                          {
+                            "id": 1,
+                            "detalleCompraId": 1,
+                            "entradaId": 1,
+                            "importe": 1
+                          }
+                        ]
+                      },
+                      "reintegro": {
+                        "id": 1,
+                        "pagoId": 1,
+                        "devolucionId": 1,
+                        "claveIdempotencia": "ejemplo",
+                        "importe": 1,
+                        "estado": "PENDIENTE",
+                        "fechaProcesamiento": "2030-12-01T21:00:00",
+                        "referenciaExterna": "ejemplo"
+                      },
+                      "etapa": "REINTEGRO",
+                      "cancelacionEvento": true
+                    }
+                  ],
+                  "comprasPendientes": [
+                    1
+                  ]
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Cancelacion registrada con compras pendientes; repetir para recuperar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelacionEventoDTO"
+                },
+                "example": {
+                  "eventoId": 1,
+                  "devoluciones": [
+                    {
+                      "devolucion": {
+                        "id": 1,
+                        "compraId": 1,
+                        "clienteId": 1,
+                        "eventoId": 1,
+                        "fechaSolicitud": "2030-12-01T21:00:00",
+                        "estado": "PENDIENTE",
+                        "motivo": "ejemplo",
+                        "motivoResolucion": "ejemplo",
+                        "motivoRechazo": "ejemplo",
+                        "fechaResolucion": "2030-12-01T21:00:00",
+                        "importeSolicitado": 1,
+                        "importeReintegrado": 1,
+                        "detalles": [
+                          {
+                            "id": 1,
+                            "detalleCompraId": 1,
+                            "entradaId": 1,
+                            "importe": 1
+                          }
+                        ]
+                      },
+                      "reintegro": {
+                        "id": 1,
+                        "pagoId": 1,
+                        "devolucionId": 1,
+                        "claveIdempotencia": "ejemplo",
+                        "importe": 1,
+                        "estado": "PENDIENTE",
+                        "fechaProcesamiento": "2030-12-01T21:00:00",
+                        "referenciaExterna": "ejemplo"
+                      },
+                      "etapa": "REINTEGRO",
+                      "cancelacionEvento": true
+                    }
+                  ],
+                  "comprasPendientes": [
+                    1
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa"
+      }
+    },
+    "/admin/devoluciones/{id}/rechazar": {
+      "post": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Rechazar una solicitud",
+        "description": "Motivo administrativo obligatorio. Accesible por el Gateway.",
+        "operationId": "compras_post_admin_devoluciones_id_rechazar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RechazarDevolucionDTO"
+              },
+              "example": {
+                "motivo": "Solicitud improcedente"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevolucionDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "fechaSolicitud": "2030-12-01T21:00:00",
+                  "estado": "PENDIENTE",
+                  "motivo": "ejemplo",
+                  "motivoResolucion": "ejemplo",
+                  "motivoRechazo": "ejemplo",
+                  "fechaResolucion": "2030-12-01T21:00:00",
+                  "importeSolicitado": 1,
+                  "importeReintegrado": 1,
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "detalleCompraId": 1,
+                      "entradaId": 1,
+                      "importe": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 415,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa"
+      }
+    },
+    "/admin/devoluciones/{id}/procesar": {
+      "post": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Procesar o recuperar una devolucion aprobada",
+        "description": "Reintegra todo el importe historico autorizado. Lo parcial se expresa seleccionando menos entradas. Reintentar con la misma clave e importe. Accesible por el Gateway.",
+        "operationId": "compras_post_admin_devoluciones_id_procesar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcesarDevolucionDTO"
+              },
+              "example": {
+                "claveIdempotencia": "devolucion-demo-1",
+                "importe": 15000
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoDevolucionDTO"
+                },
+                "example": {
+                  "devolucion": {
+                    "id": 1,
+                    "compraId": 1,
+                    "clienteId": 1,
+                    "eventoId": 1,
+                    "fechaSolicitud": "2030-12-01T21:00:00",
+                    "estado": "PENDIENTE",
+                    "motivo": "ejemplo",
+                    "motivoResolucion": "ejemplo",
+                    "motivoRechazo": "ejemplo",
+                    "fechaResolucion": "2030-12-01T21:00:00",
+                    "importeSolicitado": 1,
+                    "importeReintegrado": 1,
+                    "detalles": [
+                      {
+                        "id": 1,
+                        "detalleCompraId": 1,
+                        "entradaId": 1,
+                        "importe": 1
+                      }
+                    ]
+                  },
+                  "reintegro": {
+                    "id": 1,
+                    "pagoId": 1,
+                    "devolucionId": 1,
+                    "claveIdempotencia": "ejemplo",
+                    "importe": 1,
+                    "estado": "PENDIENTE",
+                    "fechaProcesamiento": "2030-12-01T21:00:00",
+                    "referenciaExterna": "ejemplo"
+                  },
+                  "etapa": "REINTEGRO",
+                  "cancelacionEvento": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 415,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa"
+      }
+    },
+    "/admin/devoluciones/{id}/aprobar": {
+      "post": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Aprobar una solicitud",
+        "description": "Motivo administrativo obligatorio. No procesa el reintegro. Accesible por el Gateway.",
+        "operationId": "compras_post_admin_devoluciones_id_aprobar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AprobarDevolucionDTO"
+              },
+              "example": {
+                "motivo": "Solicitud revisada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevolucionDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "fechaSolicitud": "2030-12-01T21:00:00",
+                  "estado": "PENDIENTE",
+                  "motivo": "ejemplo",
+                  "motivoResolucion": "ejemplo",
+                  "motivoRechazo": "ejemplo",
+                  "fechaResolucion": "2030-12-01T21:00:00",
+                  "importeSolicitado": 1,
+                  "importeReintegrado": 1,
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "detalleCompraId": 1,
+                      "entradaId": 1,
+                      "importe": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type no admitido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 415,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa"
+      }
+    },
+    "/pagos/{id}": {
+      "get": {
+        "tags": [
+          "Pagos"
+        ],
+        "summary": "Consultar un pago por ID",
+        "description": "Devuelve la información de un pago a partir de su identificador. Accesible por el Gateway.",
+        "operationId": "compras_get_pagos_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pago encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagoDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "claveIdempotencia": "ejemplo",
+                  "importe": 1,
+                  "importeReintegrado": 1,
+                  "estado": "PENDIENTE",
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "fechaProcesamiento": "2030-12-01T21:00:00",
+                  "referenciaExterna": "ejemplo",
+                  "referenciaReintegro": "ejemplo",
+                  "medioPago": "TARJETA_CREDITO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Identificador inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe un pago con el ID indicado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/internal/orders/{id}": {
+      "get": {
+        "tags": [
+          "orden-interna-controller"
+        ],
+        "operationId": "compras_get_internal_orders_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "orderId": "1",
+                  "clientId": "1",
+                  "status": "CONFIRMADA",
+                  "items": [
+                    {
+                      "eventId": "1",
+                      "sectorId": "1",
+                      "seatId": "1",
+                      "quantity": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna",
+        "summary": "GET /internal/orders/{id}",
+        "description": "Operacion implementada por compras. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/devoluciones/{id}": {
+      "get": {
+        "tags": [
+          "Devoluciones"
+        ],
+        "summary": "Consultar una devolucion",
+        "operationId": "compras_get_devoluciones_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o solicitud incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DevolucionDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "compraId": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "fechaSolicitud": "2030-12-01T21:00:00",
+                  "estado": "PENDIENTE",
+                  "motivo": "ejemplo",
+                  "motivoResolucion": "ejemplo",
+                  "motivoRechazo": "ejemplo",
+                  "fechaResolucion": "2030-12-01T21:00:00",
+                  "importeSolicitado": 1,
+                  "importeReintegrado": 1,
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "detalleCompraId": 1,
+                      "entradaId": 1,
+                      "importe": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica",
+        "description": "Operacion implementada por compras. Accesible por el Gateway."
+      }
+    },
+    "/compras/{id}": {
+      "get": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Consultar una compra por ID",
+        "description": "Devuelve la información de una compra a partir de su identificador. Accesible por el Gateway.",
+        "operationId": "compras_get_compras_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compra encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "clienteId": 1,
+                  "eventoId": 1,
+                  "reservaId": 1,
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "importeTotal": 1,
+                  "estado": "PENDIENTE",
+                  "detalles": [
+                    {
+                      "id": 1,
+                      "sectorId": 1,
+                      "asientoId": 1,
+                      "cantidad": 1,
+                      "precioUnitario": 1,
+                      "subtotal": 1
+                    }
+                  ],
+                  "etapa": "PAGO",
+                  "entradasIds": [
+                    1
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe una compra con el ID indicado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/compras/{id}/estado": {
+      "get": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Consultar estado y etapa de una compra",
+        "operationId": "compras_get_compras_id_estado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                "example": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica",
+        "description": "Operacion implementada por compras. Accesible por el Gateway."
+      }
+    },
+    "/compras/{id}/entradas": {
+      "get": {
+        "tags": [
+          "compra-entradas-controller"
+        ],
+        "summary": "Consultar entradas seleccionables para devolucion",
+        "description": "Asocia por unidad el ID numerico aceptado en entradasIds, UUID externo y asiento operativo. No inferir correspondencias por posicion de listas. Accesible por el Gateway.",
+        "operationId": "compras_get_compras_id_entradas",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntradaSeleccionable"
+                  }
+                },
+                "example": [
+                  {
+                    "entradaId": 1,
+                    "ticketId": "00000000-0000-4000-8000-000000000001",
+                    "sectorId": 1,
+                    "asientoId": 1,
+                    "estado": "EMITIDA"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Entradas inaccesible o respuesta incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/compras/{id}/detalle": {
+      "get": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Consultar detalles de una compra",
+        "operationId": "compras_get_compras_id_detalle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DetalleCompraRespuestaDTO"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "sectorId": 1,
+                    "asientoId": 1,
+                    "cantidad": 1,
+                    "precioUnitario": 1,
+                    "subtotal": 1
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto de estado, identidad o turno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica",
+        "description": "Operacion implementada por compras. Accesible por el Gateway."
+      }
+    },
+    "/admin/reintegros/{id}": {
+      "get": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Consultar un reintegro por ID",
+        "operationId": "compras_get_admin_reintegros_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReintegroDTO"
+                },
+                "example": {
+                  "id": 1,
+                  "pagoId": 1,
+                  "devolucionId": 1,
+                  "claveIdempotencia": "ejemplo",
+                  "importe": 1,
+                  "estado": "PENDIENTE",
+                  "fechaProcesamiento": "2030-12-01T21:00:00",
+                  "referenciaExterna": "ejemplo"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa",
+        "description": "Operacion implementada por compras. Accesible por el Gateway."
+      }
+    },
+    "/admin/devoluciones": {
+      "get": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Consultar devoluciones por estado",
+        "operationId": "compras_get_admin_devoluciones",
+        "parameters": [
+          {
+            "name": "estado",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDIENTE",
+                "APROBADA",
+                "RECHAZADA",
+                "PROCESANDO",
+                "COMPLETADA",
+                "ERROR_PENDIENTE"
+              ]
+            }
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DevolucionDTO"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "compraId": 1,
+                    "clienteId": 1,
+                    "eventoId": 1,
+                    "fechaSolicitud": "2030-12-01T21:00:00",
+                    "estado": "PENDIENTE",
+                    "motivo": "ejemplo",
+                    "motivoResolucion": "ejemplo",
+                    "motivoRechazo": "ejemplo",
+                    "fechaResolucion": "2030-12-01T21:00:00",
+                    "importeSolicitado": 1,
+                    "importeReintegrado": 1,
+                    "detalles": [
+                      {
+                        "id": 1,
+                        "detalleCompraId": 1,
+                        "entradaId": 1,
+                        "importe": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa",
+        "description": "Operacion implementada por compras. Accesible por el Gateway."
+      }
+    },
+    "/admin/devoluciones/{id}/procesamiento": {
+      "get": {
+        "tags": [
+          "Administracion de devoluciones"
+        ],
+        "summary": "Consultar avance y reintegro de una devolucion",
+        "operationId": "compras_get_admin_devoluciones_id_procesamiento",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "X-Admin-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            },
+            "example": 7,
+            "description": "Identidad administrativa declarada en Entrega 1; sin autenticacion JWT."
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 400,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 404,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado, clave o procesamiento incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 409,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Operacion externa no confirmada. Consultar y reintentar con la misma clave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 503,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resultado de la operacion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoDevolucionDTO"
+                },
+                "example": {
+                  "devolucion": {
+                    "id": 1,
+                    "compraId": 1,
+                    "clienteId": 1,
+                    "eventoId": 1,
+                    "fechaSolicitud": "2030-12-01T21:00:00",
+                    "estado": "PENDIENTE",
+                    "motivo": "ejemplo",
+                    "motivoResolucion": "ejemplo",
+                    "motivoRechazo": "ejemplo",
+                    "fechaResolucion": "2030-12-01T21:00:00",
+                    "importeSolicitado": 1,
+                    "importeReintegrado": 1,
+                    "detalles": [
+                      {
+                        "id": 1,
+                        "detalleCompraId": 1,
+                        "entradaId": 1,
+                        "importe": 1
+                      }
+                    ]
+                  },
+                  "reintegro": {
+                    "id": 1,
+                    "pagoId": 1,
+                    "devolucionId": 1,
+                    "claveIdempotencia": "ejemplo",
+                    "importe": 1,
+                    "estado": "PENDIENTE",
+                    "fechaProcesamiento": "2030-12-01T21:00:00",
+                    "referenciaExterna": "ejemplo"
+                  },
+                  "etapa": "REINTEGRO",
+                  "cancelacionEvento": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Accept no admitido; error devuelto como JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "status": 406,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "administrativa",
+        "description": "Operacion implementada por compras. Accesible por el Gateway."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProcesarPagoDTO": {
+        "type": "object",
+        "properties": {
+          "compraId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "claveIdempotencia": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "medioPago": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Obligatorio al crear un pago. En reintentos debe coincidir con el medio original. Omitir solo al recuperar un pago historico que carece del dato.",
+            "enum": [
+              "TARJETA_CREDITO",
+              "TARJETA_DEBITO",
+              "TRANSFERENCIA",
+              "BILLETERA_VIRTUAL"
+            ],
+            "example": "TARJETA_DEBITO"
+          }
+        },
+        "required": [
+          "claveIdempotencia",
+          "compraId"
+        ]
+      },
+      "PagoDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "compraId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "claveIdempotencia": {
+            "type": "string"
+          },
+          "importe": {
+            "type": "number"
+          },
+          "importeReintegrado": {
+            "type": "number"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PENDIENTE",
+              "APROBADO",
+              "RECHAZADO",
+              "RESULTADO_DESCONOCIDO",
+              "REINTEGRO_DESCONOCIDO",
+              "REINTEGRADO_PARCIAL",
+              "REINTEGRADO_TOTAL"
+            ]
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "fechaProcesamiento": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "referenciaExterna": {
+            "type": "string"
+          },
+          "referenciaReintegro": {
+            "type": "string"
+          },
+          "medioPago": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Medio registrado al iniciar el pago; null si el registro historico no contiene el dato",
+            "enum": [
+              "TARJETA_CREDITO",
+              "TARJETA_DEBITO",
+              "TRANSFERENCIA",
+              "BILLETERA_VIRTUAL"
+            ]
+          }
+        }
+      },
+      "SolicitarDevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "compraId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "clienteId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "entradasIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64",
+              "exclusiveMinimum": 0
+            },
+            "minItems": 1
+          },
+          "motivo": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "clienteId",
+          "compraId",
+          "entradasIds",
+          "motivo"
+        ]
+      },
+      "DetalleDevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "detalleCompraId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "entradaId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "importe": {
+            "type": "number"
+          }
+        }
+      },
+      "DevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "compraId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "clienteId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "eventoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fechaSolicitud": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PENDIENTE",
+              "APROBADA",
+              "RECHAZADA",
+              "PROCESANDO",
+              "COMPLETADA",
+              "ERROR_PENDIENTE"
+            ]
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "motivoResolucion": {
+            "type": "string"
+          },
+          "motivoRechazo": {
+            "type": "string"
+          },
+          "fechaResolucion": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "importeSolicitado": {
+            "type": "number"
+          },
+          "importeReintegrado": {
+            "type": "number"
+          },
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetalleDevolucionDTO"
+            }
+          }
+        }
+      },
+      "CrearCompraDTO": {
+        "type": "object",
+        "properties": {
+          "clienteId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "eventoId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "reservaId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetalleCompraDTO"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "clienteId",
+          "detalles",
+          "eventoId",
+          "reservaId"
+        ]
+      },
+      "DetalleCompraDTO": {
+        "type": "object",
+        "properties": {
+          "sectorId": {
+            "type": "integer",
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "asientoId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "exclusiveMinimum": 0
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "cantidad",
+          "sectorId"
+        ]
+      },
+      "CompraDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "clienteId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "eventoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "reservaId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "importeTotal": {
+            "type": "number"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PENDIENTE",
+              "PROCESANDO",
+              "COMPLETADA",
+              "FALLIDA",
+              "CANCELADA",
+              "DEVUELTA_PARCIAL",
+              "DEVUELTA_TOTAL"
+            ]
+          },
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetalleCompraRespuestaDTO"
+            }
+          },
+          "etapa": {
+            "type": "string",
+            "enum": [
+              "PAGO",
+              "CONFIRMACION",
+              "EMISION",
+              "COMPENSACION",
+              "LIBERACION",
+              "FINALIZADA"
+            ]
+          },
+          "entradasIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "DetalleCompraRespuestaDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sectorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "asientoId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "precioUnitario": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        }
+      },
+      "CancelacionEventoDTO": {
+        "type": "object",
+        "properties": {
+          "eventoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "devoluciones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResultadoDevolucionDTO"
+            }
+          },
+          "comprasPendientes": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "ReintegroDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pagoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "devolucionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "claveIdempotencia": {
+            "type": "string"
+          },
+          "importe": {
+            "type": "number"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PENDIENTE",
+              "COMPLETADO",
+              "RECHAZADO",
+              "RESULTADO_DESCONOCIDO"
+            ]
+          },
+          "fechaProcesamiento": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "referenciaExterna": {
+            "type": "string"
+          }
+        }
+      },
+      "ResultadoDevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "devolucion": {
+            "$ref": "#/components/schemas/DevolucionDTO"
+          },
+          "reintegro": {
+            "$ref": "#/components/schemas/ReintegroDTO"
+          },
+          "etapa": {
+            "type": "string",
+            "enum": [
+              "REINTEGRO",
+              "ANULACION",
+              "LIBERACION",
+              "FINALIZADA"
+            ]
+          },
+          "cancelacionEvento": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RechazarDevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "motivo"
+        ]
+      },
+      "ProcesarDevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "claveIdempotencia": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "importe": {
+            "type": "number",
+            "minimum": 0.01
+          }
+        },
+        "required": [
+          "claveIdempotencia",
+          "importe"
+        ]
+      },
+      "AprobarDevolucionDTO": {
+        "type": "object",
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "motivo"
+        ]
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string"
+          },
+          "sectorId": {
+            "type": "string"
+          },
+          "seatId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          }
+        }
+      },
+      "EntradaSeleccionable": {
+        "type": "object",
+        "properties": {
+          "entradaId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sectorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "asientoId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "estado": {
+            "type": "string"
+          }
+        },
+        "description": "Una unidad: ID numerico de devolucion, UUID de Entradas y asiento operativo (null en general). Seleccionar por identidad, nunca por posicion."
+      },
+      "ErrorHTTP": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ]
+      }
+    }
+  }
+}

@@ -16,6 +16,8 @@ public class Asiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAsiento;
 
+    private Long catalogoAsientoId;
+
     @Column(nullable = false)
     private String fila;
     @Column(nullable = false)

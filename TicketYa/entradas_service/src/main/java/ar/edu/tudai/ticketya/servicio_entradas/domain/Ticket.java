@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tickets", uniqueConstraints = @UniqueConstraint(name = "uk_ticket_qr_payload", columnNames = "qr_payload"))
 public class Ticket {
+    @Version private Long version;
     @Id @Column(name = "ticket_id", nullable = false, length = 36)
     private String ticketId;
     @Column(name = "qr_payload", nullable = false, length = 36)

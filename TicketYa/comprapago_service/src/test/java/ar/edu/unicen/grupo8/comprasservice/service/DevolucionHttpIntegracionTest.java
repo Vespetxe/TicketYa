@@ -74,6 +74,7 @@ class DevolucionHttpIntegracionTest {
     }
     private java.net.http.HttpResponse<String> http(String metodo, String ruta, Object dto) throws Exception {
         var b = java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://127.0.0.1:" + port + ruta));
+        if(ruta.startsWith("/admin/"))b.header("X-Admin-Id","7");
         if (dto == null) b.GET(); else b.header("Content-Type", "application/json").method(metodo,
                 java.net.http.HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(dto)));
         return http.send(b.build(), java.net.http.HttpResponse.BodyHandlers.ofString());

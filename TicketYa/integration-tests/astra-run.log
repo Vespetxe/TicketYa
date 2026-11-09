@@ -1,0 +1,19 @@
+test_anulacion_impide_emision_tardia (__main__.Entrega1RealTest.test_anulacion_impide_emision_tardia) ... ok
+test_busqueda_ciudad_y_gateway_interno (__main__.Entrega1RealTest.test_busqueda_ciudad_y_gateway_interno) ... ok
+test_cancelacion_recupera_pago_incierto_con_reintentos_concurrentes (__main__.Entrega1RealTest.test_cancelacion_recupera_pago_incierto_con_reintentos_concurrentes) ... ok
+test_cancelacion_reintegra_y_bloquea (__main__.Entrega1RealTest.test_cancelacion_reintegra_y_bloquea) ... ok
+test_compra_numerada_y_reintentos (__main__.Entrega1RealTest.test_compra_numerada_y_reintentos) ... ok
+test_concurrencia_ultimo_cupo (__main__.Entrega1RealTest.test_concurrencia_ultimo_cupo) ... ok
+test_devolucion_parcial_idempotente (__main__.Entrega1RealTest.test_devolucion_parcial_idempotente) ... ok
+test_estados_relevancia_y_devolucion_de_evento_agotado (__main__.Entrega1RealTest.test_estados_relevancia_y_devolucion_de_evento_agotado) ... ok
+test_pago_rechazado_libera (__main__.Entrega1RealTest.test_pago_rechazado_libera) ... ok
+test_pago_recuperado_tras_vencimiento_se_compensa (__main__.Entrega1RealTest.test_pago_recuperado_tras_vencimiento_se_compensa) ... ok
+test_publicacion_reanuda_inventario_parcial_sin_duplicar (__main__.Entrega1RealTest.test_publicacion_reanuda_inventario_parcial_sin_duplicar) ... ok
+test_reserva_vencida_no_puede_pagarse (__main__.Entrega1RealTest.test_reserva_vencida_no_puede_pagarse) ... ok
+test_suspension_bloquea_reservas (__main__.Entrega1RealTest.test_suspension_bloquea_reservas) ... ok
+test_timeout_pago_se_recupera_sin_duplicar (__main__.Entrega1RealTest.test_timeout_pago_se_recupera_sin_duplicar) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 41.458s
+
+OK

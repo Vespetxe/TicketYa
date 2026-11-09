@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 public class VenueResponseDTO {
+    private String city;
+    public String getCity() {return city;}
+    public void setCity(String city) {this.city=city;}
 
     private Long venueId;
     private String name;

@@ -1,0 +1,1609 @@
+{
+  "columns": [
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "compra_entradas",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "compra_entradas",
+      "column": "entrada_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "compras",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "compras",
+      "column": "bloqueo_hasta",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "bit(1)",
+      "table": "compras",
+      "column": "cancelacion_solicitada",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "compras",
+      "column": "cliente_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "compras",
+      "column": "ejecutor",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "enum('CANCELADA','COMPLETADA','DEVUELTA_PARCIAL','DEVUELTA_TOTAL','FALLIDA','PENDIENTE','PROCESANDO')",
+      "table": "compras",
+      "column": "estado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('COMPENSACION','CONFIRMACION','EMISION','FINALIZADA','LIBERACION','PAGO')",
+      "table": "compras",
+      "column": "etapa",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "compras",
+      "column": "evento_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "compras",
+      "column": "fecha_creacion",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "compras",
+      "column": "importe_total",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "UNI",
+      "type": "bigint",
+      "table": "compras",
+      "column": "reserva_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "compras",
+      "column": "reserva_vencimiento",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "compras",
+      "column": "version",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "control_limite_entradas",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "control_limite_entradas",
+      "column": "cliente_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "control_limite_entradas",
+      "column": "evento_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "detalles_compra",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "detalles_compra",
+      "column": "asiento_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "detalles_compra",
+      "column": "cantidad",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "detalles_compra",
+      "column": "precio_unitario",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "detalles_compra",
+      "column": "sector_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "detalles_compra",
+      "column": "subtotal",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "detalles_compra",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "detalles_devolucion",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "detalles_devolucion",
+      "column": "entrada_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "detalles_devolucion",
+      "column": "importe",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "detalles_devolucion",
+      "column": "detalle_compra_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "detalles_devolucion",
+      "column": "devolucion_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "devoluciones",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bit(1)",
+      "table": "devoluciones",
+      "column": "cancelacion_evento",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('APROBADA','COMPLETADA','ERROR_PENDIENTE','PENDIENTE','PROCESANDO','RECHAZADA')",
+      "table": "devoluciones",
+      "column": "estado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('ANULACION','FINALIZADA','LIBERACION','REINTEGRO')",
+      "table": "devoluciones",
+      "column": "etapa",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "devoluciones",
+      "column": "fecha_resolucion",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "devoluciones",
+      "column": "fecha_solicitud",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "devoluciones",
+      "column": "importe_reintegrado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "devoluciones",
+      "column": "importe_solicitado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "devoluciones",
+      "column": "motivo",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "devoluciones",
+      "column": "motivo_rechazo",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "devoluciones",
+      "column": "motivo_resolucion",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "devoluciones",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "entrada_externa",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "UNI",
+      "type": "varchar(36)",
+      "table": "entrada_externa",
+      "column": "uuid",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "varchar(180)",
+      "table": "operaciones_simuladas",
+      "column": "clave",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "longtext",
+      "table": "operaciones_simuladas",
+      "column": "datos",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "pagos",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "UNI",
+      "type": "varchar(255)",
+      "table": "pagos",
+      "column": "clave_idempotencia",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('APROBADO','PENDIENTE','RECHAZADO','REINTEGRADO_PARCIAL','REINTEGRADO_TOTAL','REINTEGRO_DESCONOCIDO','RESULTADO_DESCONOCIDO')",
+      "table": "pagos",
+      "column": "estado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "pagos",
+      "column": "fecha_creacion",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "pagos",
+      "column": "fecha_procesamiento",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "pagos",
+      "column": "importe",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "pagos",
+      "column": "importe_reintegrado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('BILLETERA_VIRTUAL','TARJETA_CREDITO','TARJETA_DEBITO','TRANSFERENCIA')",
+      "table": "pagos",
+      "column": "medio_pago",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "pagos",
+      "column": "referencia_externa",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "pagos",
+      "column": "referencia_reintegro",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "pagos",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "reintegros",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "UNI",
+      "type": "varchar(255)",
+      "table": "reintegros",
+      "column": "clave_idempotencia",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('COMPLETADO','PENDIENTE','RECHAZADO','RESULTADO_DESCONOCIDO')",
+      "table": "reintegros",
+      "column": "estado",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "reintegros",
+      "column": "fecha_procesamiento",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "reintegros",
+      "column": "importe",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "reintegros",
+      "column": "referencia_externa",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "reintegros",
+      "column": "devolucion_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "YES"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "reintegros",
+      "column": "pago_id",
+      "schema": "ticketya_e1_compras",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "varchar(64)",
+      "table": "emission_event_gate",
+      "column": "event_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bit(1)",
+      "table": "emission_event_gate",
+      "column": "cancelled",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "ticket_batches",
+      "column": "id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bit(1)",
+      "table": "ticket_batches",
+      "column": "cancelled",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "ticket_batches",
+      "column": "issued_at",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "UNI",
+      "type": "varchar(64)",
+      "table": "ticket_batches",
+      "column": "order_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "varchar(36)",
+      "table": "tickets",
+      "column": "ticket_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(64)",
+      "table": "tickets",
+      "column": "client_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(64)",
+      "table": "tickets",
+      "column": "event_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "UNI",
+      "type": "varchar(36)",
+      "table": "tickets",
+      "column": "qr_payload",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(64)",
+      "table": "tickets",
+      "column": "seat_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "varchar(64)",
+      "table": "tickets",
+      "column": "sector_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('ANULADA','EMITIDA','REINTEGRADA')",
+      "table": "tickets",
+      "column": "status",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "tickets",
+      "column": "version",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "tickets",
+      "column": "batch_id",
+      "schema": "ticketya_e1_entradas",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "event",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "text",
+      "table": "event",
+      "column": "description",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "varchar(50)",
+      "table": "event",
+      "column": "event_type",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(200)",
+      "table": "event",
+      "column": "name",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "event",
+      "column": "organizer_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "event",
+      "column": "start_date_time",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('AGOTADO','BORRADOR','CANCELADO','FINALIZADO','PUBLICADO','SUSPENDIDO')",
+      "table": "event",
+      "column": "status",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "event",
+      "column": "venue_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "event",
+      "column": "version",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "event_participant",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "event_participant",
+      "column": "participant_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "event_sector_price",
+      "column": "event_sector_price_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(12,2)",
+      "table": "event_sector_price",
+      "column": "price",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "event_sector_price",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "event_sector_price",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "participant",
+      "column": "participant_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(150)",
+      "table": "participant",
+      "column": "name",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(50)",
+      "table": "participant",
+      "column": "role",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "YES"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "seat",
+      "column": "seat_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(10)",
+      "table": "seat",
+      "column": "row_label",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "seat",
+      "column": "seat_number",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "seat",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "sector",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "sector",
+      "column": "capacity",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "sector",
+      "column": "created_at",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(100)",
+      "table": "sector",
+      "column": "name",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('NO_NUMERADO','NUMERADO')",
+      "table": "sector",
+      "column": "type",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "sector",
+      "column": "venue_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "venue",
+      "column": "venue_id",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "venue",
+      "column": "address",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "venue",
+      "column": "city",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "venue",
+      "column": "created_at",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(8,6)",
+      "table": "venue",
+      "column": "latitude",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "decimal(9,6)",
+      "table": "venue",
+      "column": "longitude",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(150)",
+      "table": "venue",
+      "column": "name",
+      "schema": "ticketya_e1_eventos",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "asiento",
+      "column": "id_asiento",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "asiento",
+      "column": "catalogo_asiento_id",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "YES"
+    },
+    {
+      "key": "",
+      "type": "enum('CANCELADO','LIBRE','OCUPADO','RESERVADO')",
+      "table": "asiento",
+      "column": "estado",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "varchar(255)",
+      "table": "asiento",
+      "column": "fila",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "asiento",
+      "column": "numero",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "asiento",
+      "column": "id_inventario_sector",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "control_evento",
+      "column": "id_evento",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('CANCELADO','DESHABILITADO','HABILITADO','PREPARADO')",
+      "table": "control_evento",
+      "column": "estado",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "YES"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "detalle_reserva",
+      "column": "id_detalle_reserva",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "detalle_reserva",
+      "column": "id_asiento",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "YES"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "detalle_reserva",
+      "column": "id_reserva",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "inventario_sector",
+      "column": "id_inventario_sector",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "inventario_sector",
+      "column": "capacidad_total",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "inventario_sector",
+      "column": "disponibles",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bit(1)",
+      "table": "inventario_sector",
+      "column": "es_numerado",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "enum('CANCELADO','DESHABILITADO','HABILITADO','PREPARADO')",
+      "table": "inventario_sector",
+      "column": "estado",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "inventario_sector",
+      "column": "id_evento",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "inventario_sector",
+      "column": "id_sector",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "lugares_devueltos",
+      "column": "id",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "lugares_devueltos",
+      "column": "asiento_id",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "YES"
+    },
+    {
+      "key": "UNI",
+      "type": "varchar(64)",
+      "table": "lugares_devueltos",
+      "column": "entrada_id",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "lugares_devueltos",
+      "column": "reserva_id_reserva",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "PRI",
+      "type": "bigint",
+      "table": "reserva",
+      "column": "id_reserva",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "int",
+      "table": "reserva",
+      "column": "cantidad",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "enum('CONFIRMADA','EXPIRADA','LIBERADA','PENDIENTE')",
+      "table": "reserva",
+      "column": "estado",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "reserva",
+      "column": "fecha_creacion",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "datetime(6)",
+      "table": "reserva",
+      "column": "fecha_expiracion",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "MUL",
+      "type": "bigint",
+      "table": "reserva",
+      "column": "id_cliente",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "reserva",
+      "column": "id_evento",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    },
+    {
+      "key": "",
+      "type": "bigint",
+      "table": "reserva",
+      "column": "id_sector",
+      "schema": "ticketya_e1_inventario",
+      "nullable": "NO"
+    }
+  ],
+  "foreign_keys": [
+    {
+      "table": "compra_entradas",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "compras",
+      "target_column": "id"
+    },
+    {
+      "table": "detalles_compra",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "compras",
+      "target_column": "id"
+    },
+    {
+      "table": "detalles_devolucion",
+      "column": "devolucion_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "devoluciones",
+      "target_column": "id"
+    },
+    {
+      "table": "detalles_devolucion",
+      "column": "detalle_compra_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "detalles_compra",
+      "target_column": "id"
+    },
+    {
+      "table": "devoluciones",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "compras",
+      "target_column": "id"
+    },
+    {
+      "table": "pagos",
+      "column": "compra_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "compras",
+      "target_column": "id"
+    },
+    {
+      "table": "reintegros",
+      "column": "pago_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "pagos",
+      "target_column": "id"
+    },
+    {
+      "table": "reintegros",
+      "column": "devolucion_id",
+      "schema": "ticketya_e1_compras",
+      "target_table": "devoluciones",
+      "target_column": "id"
+    },
+    {
+      "table": "tickets",
+      "column": "batch_id",
+      "schema": "ticketya_e1_entradas",
+      "target_table": "ticket_batches",
+      "target_column": "id"
+    },
+    {
+      "table": "event_participant",
+      "column": "participant_id",
+      "schema": "ticketya_e1_eventos",
+      "target_table": "participant",
+      "target_column": "participant_id"
+    },
+    {
+      "table": "event_participant",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "target_table": "event",
+      "target_column": "event_id"
+    },
+    {
+      "table": "event_sector_price",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "target_table": "event",
+      "target_column": "event_id"
+    },
+    {
+      "table": "seat",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "target_table": "sector",
+      "target_column": "sector_id"
+    },
+    {
+      "table": "sector",
+      "column": "venue_id",
+      "schema": "ticketya_e1_eventos",
+      "target_table": "venue",
+      "target_column": "venue_id"
+    },
+    {
+      "table": "asiento",
+      "column": "id_inventario_sector",
+      "schema": "ticketya_e1_inventario",
+      "target_table": "inventario_sector",
+      "target_column": "id_inventario_sector"
+    },
+    {
+      "table": "detalle_reserva",
+      "column": "id_reserva",
+      "schema": "ticketya_e1_inventario",
+      "target_table": "reserva",
+      "target_column": "id_reserva"
+    },
+    {
+      "table": "detalle_reserva",
+      "column": "id_asiento",
+      "schema": "ticketya_e1_inventario",
+      "target_table": "asiento",
+      "target_column": "id_asiento"
+    },
+    {
+      "table": "lugares_devueltos",
+      "column": "reserva_id_reserva",
+      "schema": "ticketya_e1_inventario",
+      "target_table": "reserva",
+      "target_column": "id_reserva"
+    }
+  ],
+  "unique_indexes": [
+    {
+      "index": "UKhd3ta93i0p6eh8h2s31ww3o56",
+      "table": "compra_entradas",
+      "column": "entrada_id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "compras",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "uk_compra_reserva",
+      "table": "compras",
+      "column": "reserva_id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "control_limite_entradas",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "UKm4m48ih5qy2h6srfraymnhst8",
+      "table": "control_limite_entradas",
+      "column": "cliente_id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "UKm4m48ih5qy2h6srfraymnhst8",
+      "table": "control_limite_entradas",
+      "column": "evento_id",
+      "schema": "ticketya_e1_compras",
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "detalles_compra",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "detalles_devolucion",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "devoluciones",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "entrada_externa",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "UKks5eqvwj4oxai4tibjlau8yf5",
+      "table": "entrada_externa",
+      "column": "uuid",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "operaciones_simuladas",
+      "column": "clave",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "pagos",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "uk_pago_clave_idempotencia",
+      "table": "pagos",
+      "column": "clave_idempotencia",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "reintegros",
+      "column": "id",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "uk_reintegro_clave_idempotencia",
+      "table": "reintegros",
+      "column": "clave_idempotencia",
+      "schema": "ticketya_e1_compras",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "emission_event_gate",
+      "column": "event_id",
+      "schema": "ticketya_e1_entradas",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "ticket_batches",
+      "column": "id",
+      "schema": "ticketya_e1_entradas",
+      "position": 1
+    },
+    {
+      "index": "uk_ticket_batch_order_id",
+      "table": "ticket_batches",
+      "column": "order_id",
+      "schema": "ticketya_e1_entradas",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "tickets",
+      "column": "ticket_id",
+      "schema": "ticketya_e1_entradas",
+      "position": 1
+    },
+    {
+      "index": "uk_ticket_qr_payload",
+      "table": "tickets",
+      "column": "qr_payload",
+      "schema": "ticketya_e1_entradas",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "event",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "event_participant",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "event_participant",
+      "column": "participant_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "event_sector_price",
+      "column": "event_sector_price_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "uk_event_sector",
+      "table": "event_sector_price",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 2
+    },
+    {
+      "index": "uk_event_sector",
+      "table": "event_sector_price",
+      "column": "event_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "participant",
+      "column": "participant_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "seat",
+      "column": "seat_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "uk_sector_row_seat",
+      "table": "seat",
+      "column": "row_label",
+      "schema": "ticketya_e1_eventos",
+      "position": 2
+    },
+    {
+      "index": "uk_sector_row_seat",
+      "table": "seat",
+      "column": "seat_number",
+      "schema": "ticketya_e1_eventos",
+      "position": 3
+    },
+    {
+      "index": "uk_sector_row_seat",
+      "table": "seat",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "sector",
+      "column": "sector_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "uk_venue_sector_name",
+      "table": "sector",
+      "column": "name",
+      "schema": "ticketya_e1_eventos",
+      "position": 2
+    },
+    {
+      "index": "uk_venue_sector_name",
+      "table": "sector",
+      "column": "venue_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "venue",
+      "column": "venue_id",
+      "schema": "ticketya_e1_eventos",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "asiento",
+      "column": "id_asiento",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "control_evento",
+      "column": "id_evento",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "detalle_reserva",
+      "column": "id_detalle_reserva",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "inventario_sector",
+      "column": "id_inventario_sector",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "uk_inventario_evento_sector",
+      "table": "inventario_sector",
+      "column": "id_evento",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "uk_inventario_evento_sector",
+      "table": "inventario_sector",
+      "column": "id_sector",
+      "schema": "ticketya_e1_inventario",
+      "position": 2
+    },
+    {
+      "index": "PRIMARY",
+      "table": "lugares_devueltos",
+      "column": "id",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "UKjql2ym452skh21et06eww6kvv",
+      "table": "lugares_devueltos",
+      "column": "entrada_id",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    },
+    {
+      "index": "PRIMARY",
+      "table": "reserva",
+      "column": "id_reserva",
+      "schema": "ticketya_e1_inventario",
+      "position": 1
+    }
+  ]
+}

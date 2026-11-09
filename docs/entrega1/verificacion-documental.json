@@ -1,0 +1,28 @@
+{
+  "fecha_utc": "2026-11-09T12:46:32.645730+00:00",
+  "tipo": "verificacion estatica documental, sin auditoria final de conformidad",
+  "resultado": "OK",
+  "conteos": {
+    "operaciones_openapi": {
+      "eventos": 19,
+      "inventario": 15,
+      "compras": 20,
+      "entradas": 6,
+      "gateway": 43
+    },
+    "solicitudes_postman": 77,
+    "scripts_postman_sintaxis": 84,
+    "enlaces_locales": 82,
+    "tablas_er": 26,
+    "columnas_er": 145,
+    "fk_fisicas": 18,
+    "diagramas_mermaid": 11
+  },
+  "errores": [],
+  "fuera_del_alcance_de_este_comando": [
+    "Maven, HTTP y coleccion: resultados de ejecucion separados en pruebas.md y astra-results.json",
+    "Renderizado Mermaid: no ejecutado",
+    "Validadores normativos externos de OpenAPI y Postman: no ejecutados"
+  ],
+  "efectos": "Lectura de archivos y comprobacion de sintaxis JavaScript; solo escribe este informe documental."
+}

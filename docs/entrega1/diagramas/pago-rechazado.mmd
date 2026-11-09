@@ -1,0 +1,24 @@
+sequenceDiagram
+    actor C as Cliente
+    participant G as Gateway
+    participant E as Eventos
+    participant I as Inventario
+    participant P as Compras
+    participant S as Pasarela simulada en Compras
+    participant T as Entradas
+    Note over C,P: Reserva PENDIENTE y compra PENDIENTE ya creadas via Gateway
+    C->>G: POST pagos con misma clave en los reintentos
+    G->>P: Procesar pago
+    P->>I: Verificar reserva vigente
+    P->>P: PROCESANDO etapa PAGO
+    P->>S: Cobrar importe mayor a 100000
+    S-->>P: RECHAZADO
+    P->>P: Etapa LIBERACION
+    P->>I: POST reservas id liberar
+    I->>I: Liberar retencion una sola vez
+    P->>P: FALLIDA y FINALIZADA
+    P-->>C: Resultado RECHAZADO via Gateway
+    C->>G: GET tickets por orderId
+    G->>T: Consultar
+    T-->>C: Lista vacia via Gateway
+    Note over P,S: No hay reintegro de dinero porque no hubo cobro aprobado

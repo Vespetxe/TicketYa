@@ -1,0 +1,33 @@
+sequenceDiagram
+    actor C as Cliente
+    participant G as Gateway
+    participant I as Inventario
+    participant P as Compras
+    participant S as Pasarela simulada en Compras
+    participant T as Entradas
+    C->>G: POST reservas
+    G->>I: Crear retencion
+    I-->>C: PENDIENTE y fechaExpiracion via Gateway
+    C->>G: POST compras mientras reserva vigente
+    G->>P: Crear compra
+    P->>I: Validar reserva
+    P-->>C: Compra PENDIENTE via Gateway
+    I->>I: Scheduler tras vencimiento; bloqueo y EXPIRADA; liberar stock
+    C->>G: POST pagos despues del vencimiento
+    G->>P: Intentar pago
+    P->>I: Consultar reserva
+    I-->>P: EXPIRADA
+    P-->>C: 400 sin emitir via Gateway
+    Note over C,T: Variante: un efecto de pago incierto se recupera despues de vencer
+    C->>G: Repetir pago original incierto
+    G->>P: Recuperar PROCESANDO
+    P->>S: Consultar efecto por clave original
+    S-->>P: Cobro APROBADO persistido
+    P->>I: Confirmar reserva
+    I-->>P: Conflicto por vencimiento
+    P->>T: Anular lote de orden con barrera durable
+    P->>S: Reintegrar cobro con clave de compensacion estable
+    S-->>P: Reintegro confirmado
+    P->>I: Compensar reserva sin duplicar stock
+    P->>P: FALLIDA y FINALIZADA
+    P-->>C: Pago REINTEGRADO_TOTAL via Gateway

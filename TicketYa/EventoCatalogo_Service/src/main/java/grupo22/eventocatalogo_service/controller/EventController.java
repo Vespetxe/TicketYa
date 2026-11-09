@@ -23,6 +23,8 @@ import java.util.List;
 @RequestMapping("/api/v1/events")
 @Tag(name = "Eventos", description = "Endpoints para la creación, configuración de precios y control del ciclo de vida de eventos")
 public class EventController {
+    @org.springframework.beans.factory.annotation.Autowired
+    private grupo22.eventocatalogo_service.service.EventWorkflow workflow;
 
     private final EventService eventService;
 
@@ -93,7 +95,7 @@ public class EventController {
     })
     public ResponseEntity<EventResponseDTO> publishEvent(
             @Parameter(description = "ID del evento a publicar", example = "10") @PathVariable Long eventId) {
-        EventResponseDTO response = eventService.publishEvent(eventId);
+        EventResponseDTO response = workflow.publish(eventId);
         return ResponseEntity.ok(response);
     }
 
@@ -110,8 +112,20 @@ public class EventController {
     public ResponseEntity<EventResponseDTO> cancelEvent(
             @Parameter(description = "ID del evento a cancelar", example = "10") @PathVariable Long eventId,
             @Parameter(description = "Rol del usuario autenticado (requerido ADMIN)", example = "ADMIN")
-            @RequestHeader(value = "X-User-Role", required = false) String userRole) {
-        EventResponseDTO response = eventService.cancelEvent(eventId, userRole);
+            @RequestHeader(value = "X-User-Role", required = false) String userRole,
+            @RequestHeader("X-Admin-Id") Long administradorId) {
+        EventResponseDTO response = workflow.cancel(eventId, userRole, administradorId);
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{eventId}/suspend")
+    public EventResponseDTO suspend(@PathVariable Long eventId,@RequestHeader("X-User-Role") String role,@RequestHeader("X-Admin-Id") Long administradorId) {
+        if(administradorId<=0)throw new grupo22.eventocatalogo_service.exception.BusinessRuleException("Se requiere X-Admin-Id positivo");
+        return workflow.suspend(eventId,role);
+    }
+    @PatchMapping("/{eventId}/status")
+    public EventResponseDTO status(@PathVariable Long eventId,@RequestParam String status,@RequestHeader("X-User-Role") String role,@RequestHeader("X-Admin-Id") Long administradorId){
+        if(administradorId<=0)throw new grupo22.eventocatalogo_service.exception.BusinessRuleException("Se requiere X-Admin-Id positivo");
+        return workflow.status(eventId,status,role);
     }
 }

@@ -4,6 +4,9 @@ import java.time.Instant;
 @Entity
 @Table(name = "ticket_batches", uniqueConstraints = @UniqueConstraint(name = "uk_ticket_batch_order_id", columnNames = "order_id"))
 public class TicketBatch {
+    private boolean cancelled;
+    public boolean isCancelled(){return cancelled;}
+    public void cancel(){cancelled=true;}
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "order_id", nullable = false, length = 64)

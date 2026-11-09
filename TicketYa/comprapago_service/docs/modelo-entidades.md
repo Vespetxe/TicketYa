@@ -192,7 +192,7 @@ Antes de aplicarla en otra base:
   esperar bloqueos de metadatos y produce commit implícito; ROLLBACK no deshace este DDL.
 - Usar una cuenta autorizada para ALTER y SELECT, sin incluir contraseñas en el script.
 
-Desde `compras-service`, abrir el cliente mysql con la base destino explícita
+Desde `TicketYa/comprapago_service`, abrir el cliente mysql con la base destino explícita
 (reemplazar host, puerto, usuario y nombre de base según el entorno autorizado):
 
 ```text

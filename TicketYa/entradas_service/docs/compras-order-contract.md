@@ -1,42 +1,27 @@
-# Contrato interno de órdenes para Entradas
+# Contrato interno de órdenes — Entrega 1 integrada
 
-Entradas consulta a Compras antes de emitir tickets. Compras es la fuente de verdad del estado y del detalle confirmado de la orden.
-
-## Consulta de orden
-
-`GET /internal/orders/{orderId}`
-
-### Respuesta confirmada
+Compras implementa GET `/internal/orders/{id}`; Entradas lo consulta mediante REST antes de emitir. No se publica a través del Gateway. Contratos vigentes: [Compras](../../../docs/entrega1/openapi/compras.json) y [Entradas](../../../docs/entrega1/openapi/entradas.json).
 
 ```json
 {
-  "orderId": "ord-1042",
-  "clientId": "cli-17",
+  "orderId": "1",
+  "clientId": "1",
   "status": "CONFIRMADA",
   "items": [
-    {
-      "eventId": "evt-80",
-      "sectorId": "platea",
-      "seatId": "fila-a-asiento-12",
-      "quantity": 1
-    },
-    {
-      "eventId": "evt-80",
-      "sectorId": "campo",
-      "seatId": null,
-      "quantity": 2
-    }
+    {"eventId": "1", "sectorId": "1", "seatId": "1", "quantity": 1},
+    {"eventId": "1", "sectorId": "2", "seatId": null, "quantity": 2}
   ]
 }
 ```
 
-Compras devuelve una línea por asiento numerado y puede agrupar cupos no numerados usando `quantity`. La cantidad debe ser positiva; una línea con `seatId` informado representa exactamente un asiento.
+Los IDs son ejemplos de números transportados como cadenas; deben provenir de operaciones reales. `seatId` es el ID operativo de Inventario. Cada línea numerada representa una unidad; una general permite cantidad positiva mayor a uno. Los UUID se asignan al emitir: no son IDs de compra, cliente ni asiento.
 
-### Errores y estados
+`CONFIRMADA` es una proyección para autorizar emisión: compra en `PROCESANDO` y etapa `EMISION`, o `COMPLETADA`, en ambos casos sin `cancelacionSolicitada`. No es un estado persistido de Compra. Los demás casos devuelven el nombre del estado de Compra y no habilitan emisión.
 
-- `404 Not Found`: no existe `orderId`; Entradas responde que la orden no existe y no emite.
-- `200 OK` con `status` distinto de `CONFIRMADA`: la orden existe pero no habilita emisión; Entradas rechaza la solicitud.
-- `5xx` o error de conexión: Entradas responde dependencia no disponible y no emite; Compras puede reintentar.
-- `200 OK` debe incluir `orderId`, `clientId` y al menos una unidad en `items`.
+- Compra inexistente: Compras devuelve 404; Entradas informa `ORDER_NOT_FOUND` y no emite.
+- Orden no habilitada: Entradas devuelve 409 `ORDER_NOT_CONFIRMED`.
+- Dependencia inaccesible: Entradas devuelve 503 `ORDERS_UNAVAILABLE`.
+- Detalle incompatible: 422 `INVALID_ORDER`.
+- Repetir una emisión válida devuelve el lote existente sin duplicación (200 y `created=false`); primera emisión 201 y `created=true`.
 
-El endpoint es interno y se debe acordar con el responsable de Compras antes de integrar ambos servicios.
+Consultar la orden no sustituye las barreras locales: anular la orden persiste un lote cancelado aunque no haya tickets; cancelar el evento registra un gate durable que serializa la emisión. Ambos impiden la emisión tardía. Ver [arquitectura y consistencia](../../../docs/entrega1/arquitectura.md).

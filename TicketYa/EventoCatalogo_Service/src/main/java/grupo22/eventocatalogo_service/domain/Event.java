@@ -11,6 +11,8 @@ import java.util.Set;
 @Entity
 @Table(name = "event")
 public class Event {
+    @Version
+    private Long version;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +40,6 @@ public class Event {
     private Long venueId; // Referencia interna al Venue
 
     @NotNull(message = "La fecha y hora de inicio es obligatoria")
-    @Future(message = "La fecha de inicio del evento debe ser en el futuro")
     @Column(name = "start_date_time", nullable = false)
     private OffsetDateTime startDateTime;
 

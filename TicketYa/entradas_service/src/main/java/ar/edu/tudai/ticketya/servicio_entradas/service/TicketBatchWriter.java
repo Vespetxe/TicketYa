@@ -18,13 +18,16 @@ import java.util.UUID;
 public class TicketBatchWriter {
     private final TicketBatchRepository batches;
     private final TicketRepository tickets;
-    public TicketBatchWriter(TicketBatchRepository batches, TicketRepository tickets) {
+    private final EmissionGateService gate;
+    public TicketBatchWriter(TicketBatchRepository batches, TicketRepository tickets,EmissionGateService gate) {
+        this.gate=gate;
         this.batches = batches;
         this.tickets = tickets;
     }
     @Transactional
     public List<Ticket> create(OrderSnapshot order) {
         validate(order);
+        order.items().stream().map(OrderItemSnapshot::eventId).distinct().sorted().forEach(gate::allow);
         TicketBatch batch = batches.saveAndFlush(new TicketBatch(order.orderId()));
         List<Ticket> created = new ArrayList<>();
         Set<String> numberedSeats = new HashSet<>();

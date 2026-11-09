@@ -13,6 +13,12 @@ import java.util.*;
 
 @Service
 public class PagoService {
+    @Transactional(propagation=Propagation.NEVER)
+    public void recuperarCancelacion(Long id) {
+        registro.solicitarCancelacionEvento(id);
+        for(Pago pago:obtenerPagosPorCompra(id))
+            procesarPagoConResultado(id,pago.getClaveIdempotencia(),pago.getMedioPago());
+    }
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PagoService.class);
     private final ReservaClient reservas;
     private final EntradaClient entradas;
@@ -73,6 +79,12 @@ public class PagoService {
             Compra compra = pago.getCompra();
             EtapaCompra etapa = compra.getEtapa();
             if (etapa == EtapaCompra.FINALIZADA) return;
+            if ((etapa==EtapaCompra.CONFIRMACION || etapa==EtapaCompra.EMISION)
+                    && compras.obtenerCompraPorId(compra.getId()).isCancelacionSolicitada()) {
+                registro.prepararCompensacion(pago.getId(),token);
+                pago=registro.obtener(pago.getId());
+                continue;
+            }
             switch (etapa) {
                 case PAGO -> {
                     ResultadoPasarela resultado;
@@ -128,6 +140,7 @@ public class PagoService {
                     } catch (RuntimeException ex) { pendiente(compra, ex); return; }
                     List<EntradaDTO> resultado = emitidas;
                     pago = registro.cambiar(pago.getId(), token, (c, p) -> {
+                        if(c.isCancelacionSolicitada()) { c.setEtapa(EtapaCompra.COMPENSACION); return; }
                         c.getEntradasIds().clear(); c.getEntradasIds().addAll(resultado.stream().map(EntradaDTO::entradaId).toList());
                         c.setEstado(EstadoCompra.COMPLETADA); c.setEtapa(EtapaCompra.FINALIZADA);
                     });

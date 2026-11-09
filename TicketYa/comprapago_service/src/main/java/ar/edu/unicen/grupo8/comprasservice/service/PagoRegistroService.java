@@ -15,6 +15,9 @@ import java.util.function.BiConsumer;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 public class PagoRegistroService {
+    public void solicitarCancelacionEvento(Long id) {
+        compras.buscarPorIdConBloqueo(id).orElseThrow().solicitarCancelacionEvento();
+    }
     public record Turno(Pago pago, String token, boolean creado) { }
     private final CompraRepository compras;
     private final PagoRepository pagos;

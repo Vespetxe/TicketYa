@@ -12,6 +12,9 @@ import java.util.List;
 @Entity
 @Table(name = "compras", uniqueConstraints = @UniqueConstraint(name = "uk_compra_reserva", columnNames = "reserva_id"))
 public class Compra {
+    private boolean cancelacionSolicitada;
+    public boolean isCancelacionSolicitada() { return cancelacionSolicitada; }
+    public void solicitarCancelacionEvento() { cancelacionSolicitada=true; }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

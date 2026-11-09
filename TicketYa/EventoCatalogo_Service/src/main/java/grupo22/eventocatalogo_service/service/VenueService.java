@@ -37,6 +37,7 @@ public class VenueService {
                 request.getLatitude(),
                 request.getLongitude()
         );
+        venue.setCity(request.getCity());
         Venue saved = venueRepository.save(venue);
         return mapToVenueResponse(saved);
     }
@@ -61,7 +62,7 @@ public class VenueService {
                 .orElseThrow(() -> new ResourceNotFoundException("Lugar no encontrado con el ID: " + venueId));
 
         if (sectorRepository.existsByVenueVenueIdAndName(venueId, request.getName())) {
-            throw new BusinessRuleException("Ya existe un sector con el nombre '" + request.getName() + "' en este lugar");
+            throw new BusinessRuleException("Ya existe un sector llamado '" + request.getName() + "' en este lugar");
         }
 
         // Validación de reglas según el Tipo de Sector
@@ -123,7 +124,7 @@ public class VenueService {
     }
 
     private VenueResponseDTO mapToVenueResponse(Venue venue) {
-        return new VenueResponseDTO(
+        VenueResponseDTO response = new VenueResponseDTO(
                 venue.getVenueId(),
                 venue.getName(),
                 venue.getAddress(),
@@ -131,6 +132,8 @@ public class VenueService {
                 venue.getLongitude(),
                 venue.getCreatedAt()
         );
+        response.setCity(venue.getCity());
+        return response;
     }
 
     private void validateNumeratedSectorRules(SectorRequestDTO request) {

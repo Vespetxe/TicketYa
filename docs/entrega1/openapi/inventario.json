@@ -1,0 +1,1794 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TicketYa - inventario - Entrega 1",
+    "description": "Contrato documental del codigo actual; coordinacion interna diferenciada. Identificacion declarada, sin JWT.",
+    "contact": {
+      "name": "Grupo TicketYa - TUDAI"
+    },
+    "version": "entrega-1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8082"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Inventario",
+      "description": "Endpoints para la gestión del stock, aforos, grilla de asientos y cancelaciones del inventario de eventos"
+    },
+    {
+      "name": "Reservas",
+      "description": "Endpoints para la creación temporal con TTL, confirmación, liberación y consulta de reservas"
+    }
+  ],
+  "paths": {
+    "/reservas": {
+      "get": {
+        "tags": [
+          "Reservas"
+        ],
+        "summary": "Consultar reservas de un cliente",
+        "description": "Filtra y devuelve el historial de reservas asociadas a un cliente específico. Accesible por el Gateway.",
+        "operationId": "inventario_get_reservas",
+        "parameters": [
+          {
+            "name": "idCliente",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listado de reservas del cliente retornado exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReservaResponse"
+                  }
+                },
+                "example": [
+                  {
+                    "idReserva": 1,
+                    "idCliente": 1,
+                    "idEvento": 1,
+                    "idSector": 1,
+                    "cantidad": 1,
+                    "fechaCreacion": "2030-12-01T21:00:00",
+                    "fechaExpiracion": "2030-12-01T21:00:00",
+                    "estado": "PENDIENTE",
+                    "asientosReservados": [
+                      {
+                        "idAsiento": 1,
+                        "fila": "ejemplo",
+                        "numero": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      },
+      "post": {
+        "tags": [
+          "Reservas"
+        ],
+        "summary": "Crear reserva temporal",
+        "description": "Bloquea temporalmente lugares (con TTL de 10 minutos) aplicando protección pesimista en base de datos para prevenir la doble venta. Accesible por el Gateway.",
+        "operationId": "inventario_post_reservas",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearReservaRequest"
+              },
+              "example": {
+                "idCliente": 1,
+                "idEvento": 1,
+                "idSector": 1,
+                "cantidad": 1,
+                "idsAsientos": [
+                  1
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Reserva temporal creada exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservaResponse"
+                },
+                "example": {
+                  "idReserva": 1,
+                  "idCliente": 1,
+                  "idEvento": 1,
+                  "idSector": 1,
+                  "cantidad": 1,
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "fechaExpiracion": "2030-12-01T21:00:00",
+                  "estado": "PENDIENTE",
+                  "asientosReservados": [
+                    {
+                      "idAsiento": 1,
+                      "fila": "ejemplo",
+                      "numero": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Se ingresaron datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inventario del evento/sector no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto: Asientos ya reservados/ocupados, aforo insuficiente o evento cancelado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/reservas/{id}/liberar": {
+      "post": {
+        "tags": [
+          "Reservas"
+        ],
+        "summary": "Liberar reserva",
+        "description": "Libera PENDIENTE. Repetir LIBERADA/EXPIRADA no repone stock nuevamente; EXPIRADA pasa a LIBERADA. CONFIRMADA requiere compensacion/devolucion: 409. Llamada directa entre servicios; excluida del Gateway normal.",
+        "operationId": "inventario_post_reservas_id_liberar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reserva liberada y disponibilidad restablecida exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeResponse"
+                },
+                "example": {
+                  "mensaje": "Operacion completada",
+                  "exitoso": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reserva no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna"
+      }
+    },
+    "/reservas/{id}/confirmar": {
+      "post": {
+        "tags": [
+          "Reservas"
+        ],
+        "summary": "Confirmar ocupación de reserva",
+        "description": "Confirma una reserva PENDIENTE vigente con inventario HABILITADO. Repetir CONFIRMADA es 200 mientras el inventario siga habilitado. Vencida, liberada o inventario bloqueado: 409. Llamada directa entre servicios; excluida del Gateway normal.",
+        "operationId": "inventario_post_reservas_id_confirmar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ocupación confirmada exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeResponse"
+                },
+                "example": {
+                  "mensaje": "Operacion completada",
+                  "exitoso": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reserva no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Reserva vencida/liberada o inventario bloqueado; confirmar de nuevo una confirmada con inventario habilitado es 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna"
+      }
+    },
+    "/ocupaciones/liberar": {
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Liberar lugares por devolución",
+        "description": "Liberacion con reserva e identidad estable por entrada; no basta evento/sector/cantidad. Se ejecuta despues del reintegro y anulacion, no al aprobar la solicitud. Llamada directa entre servicios; excluida del Gateway normal.",
+        "operationId": "inventario_post_ocupaciones_liberar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LiberarDevolucionRequest"
+              },
+              "example": {
+                "idReserva": 1,
+                "entradasIds": [
+                  "00000000-0000-4000-8000-000000000001"
+                ],
+                "idEvento": 1,
+                "idSector": 1,
+                "cantidad": 1,
+                "idsAsientos": [
+                  1
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Lugares reintegrados al inventario exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeResponse"
+                },
+                "example": {
+                  "mensaje": "Operacion completada",
+                  "exitoso": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inventario o asientos no encontrados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna"
+      }
+    },
+    "/internal/reservas/{id}/devoluciones": {
+      "get": {
+        "tags": [
+          "operacion-reserva-controller"
+        ],
+        "operationId": "inventario_get_internal_reservas_id_devoluciones",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "example": [
+                  "ejemplo"
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "description": "Diario de identidades externas devueltas por reserva. POST requiere reserva CONFIRMADA, seleccion propia y coherente; repetir misma identidad no duplica stock. Llamada directa entre servicios; excluida del Gateway normal.",
+        "x-visibility": "interna",
+        "summary": "GET /internal/reservas/{id}/devoluciones"
+      },
+      "post": {
+        "tags": [
+          "operacion-reserva-controller"
+        ],
+        "operationId": "inventario_post_internal_reservas_id_devoluciones",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DevolverLugaresRequest"
+              },
+              "example": {
+                "entradas": [
+                  {
+                    "entradaId": "00000000-0000-4000-8000-000000000001",
+                    "asientoId": 1
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "example": [
+                  "ejemplo"
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Datos invalidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "description": "Diario de identidades externas devueltas por reserva. POST requiere reserva CONFIRMADA, seleccion propia y coherente; repetir misma identidad no duplica stock. Llamada directa entre servicios; excluida del Gateway normal.",
+        "x-visibility": "interna",
+        "summary": "POST /internal/reservas/{id}/devoluciones"
+      }
+    },
+    "/internal/reservas/{id}/compensar": {
+      "post": {
+        "tags": [
+          "operacion-reserva-controller"
+        ],
+        "operationId": "inventario_post_internal_reservas_id_compensar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeResponse"
+                },
+                "example": {
+                  "mensaje": "Operacion completada",
+                  "exitoso": true
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "description": "Compensa retencion o confirmacion sin devoluciones parciales previas. Repeticion sin efectos adicionales; inventario CANCELADO no recupera stock ofrecido. Llamada directa entre servicios; excluida del Gateway normal.",
+        "x-visibility": "interna",
+        "summary": "POST /internal/reservas/{id}/compensar"
+      }
+    },
+    "/internal/eventos/{id}/suspender": {
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "operationId": "inventario_post_internal_eventos_id_suspender",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna",
+        "summary": "POST /internal/eventos/{id}/suspender",
+        "description": "Operacion implementada por inventario. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/internal/eventos/{id}/publicar": {
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "operationId": "inventario_post_internal_eventos_id_publicar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "description": "Habilitacion comercial posterior al commit PUBLICADO en Eventos. Transicion PREPARADO a HABILITADO en una transaccion para todos los sectores. Repetir es idempotente. DESHABILITADO o CANCELADO no se reabren por esta operacion (409). Llamada directa entre servicios; excluida del Gateway normal.",
+        "x-visibility": "interna",
+        "summary": "POST /internal/eventos/{id}/publicar"
+      }
+    },
+    "/internal/eventos/{id}/habilitar": {
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "operationId": "inventario_post_internal_eventos_id_habilitar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna",
+        "summary": "POST /internal/eventos/{id}/habilitar",
+        "description": "Operacion implementada por inventario. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/eventos/{idEvento}/inventario": {
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Inicializar inventario de evento",
+        "description": "Preparacion no comercial: crea sector PREPARADO y no admite reservas. 201 tanto al crear como al repetir configuracion compatible (capacidad, tipo y grilla con catalogoAsientoId). Configuracion incompatible: 400. Habilitar comercialmente es una operacion interna separada, posterior a PUBLICADO. Llamada directa entre servicios; excluida del Gateway normal.",
+        "operationId": "inventario_post_eventos_idEvento_inventario",
+        "parameters": [
+          {
+            "name": "idEvento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InicializarInventarioRequest"
+              },
+              "example": {
+                "idSector": 1,
+                "esNumerado": true,
+                "capacidadTotal": 2,
+                "asientos": [
+                  {
+                    "catalogoAsientoId": 1,
+                    "fila": "Fila 1",
+                    "numero": 1
+                  },
+                  {
+                    "catalogoAsientoId": 2,
+                    "fila": "Fila 1",
+                    "numero": 2
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Inventario inicializado correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeResponse"
+                },
+                "example": {
+                  "mensaje": "Operacion completada",
+                  "exitoso": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos invalidos o inicializacion incompatible; una repeticion compatible devuelve 201",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna"
+      }
+    },
+    "/eventos/{idEvento}/cancelar-inventario": {
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Cancelar inventario de evento",
+        "description": "Cancela stock del evento, marca asientos cancelados y no reofrece lugares; no representa una suspension reversible. Llamada directa entre servicios; excluida del Gateway normal.",
+        "operationId": "inventario_post_eventos_idEvento_cancelar_inventario",
+        "parameters": [
+          {
+            "name": "idEvento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inventario del evento invalidado correctamente por cancelación",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeResponse"
+                },
+                "example": {
+                  "mensaje": "Operacion completada",
+                  "exitoso": true
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Estado o disponibilidad incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "interna"
+      }
+    },
+    "/reservas/{id}": {
+      "get": {
+        "tags": [
+          "Reservas"
+        ],
+        "summary": "Consultar reserva por ID",
+        "description": "Obtiene los detalles completos de una reserva registrada en el sistema. Accesible por el Gateway.",
+        "operationId": "inventario_get_reservas_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles de la reserva retornados exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservaResponse"
+                },
+                "example": {
+                  "idReserva": 1,
+                  "idCliente": 1,
+                  "idEvento": 1,
+                  "idSector": 1,
+                  "cantidad": 1,
+                  "fechaCreacion": "2030-12-01T21:00:00",
+                  "fechaExpiracion": "2030-12-01T21:00:00",
+                  "estado": "PENDIENTE",
+                  "asientosReservados": [
+                    {
+                      "idAsiento": 1,
+                      "fila": "ejemplo",
+                      "numero": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Reserva no encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    },
+    "/disponibilidad/eventos/{idEvento}/sectores/{idSector}": {
+      "get": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Consultar disponibilidad de sector",
+        "description": "Retorna la cantidad de cupos disponibles y la grilla de asientos libres si el sector es numerado. Accesible por el Gateway.",
+        "operationId": "inventario_get_disponibilidad_eventos_idEvento_sectores_idSector",
+        "parameters": [
+          {
+            "name": "idEvento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          },
+          {
+            "name": "idSector",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de disponibilidad retornado exitosamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisponibilidadResponse"
+                },
+                "example": {
+                  "idEvento": 1,
+                  "idSector": 1,
+                  "esNumerado": true,
+                  "capacidadTotal": 1,
+                  "disponibles": 1,
+                  "asientosLibres": [
+                    {
+                      "idAsiento": 1,
+                      "fila": "ejemplo",
+                      "numero": 1
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Inventario no encontrado para el evento y sector especificados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/MensajeResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "mensaje": "Operacion no completada",
+                  "exitoso": false
+                }
+              }
+            }
+          }
+        },
+        "x-visibility": "publica"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CrearReservaRequest": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idEvento": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idSector": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idsAsientos": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "DetalleAsientoResponse": {
+        "type": "object",
+        "properties": {
+          "idAsiento": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fila": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ReservaResponse": {
+        "type": "object",
+        "properties": {
+          "idReserva": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idCliente": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idEvento": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idSector": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "fechaExpiracion": {
+            "type": "string",
+            "description": "Fecha y hora ISO local sin offset; los flujos usan reloj UTC.",
+            "example": "2030-12-01T21:00:00"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PENDIENTE",
+              "CONFIRMADA",
+              "LIBERADA",
+              "EXPIRADA"
+            ]
+          },
+          "asientosReservados": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetalleAsientoResponse"
+            }
+          }
+        }
+      },
+      "MensajeResponse": {
+        "type": "object",
+        "properties": {
+          "mensaje": {
+            "type": "string"
+          },
+          "exitoso": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LiberarDevolucionRequest": {
+        "type": "object",
+        "properties": {
+          "idReserva": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "entradasIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "idEvento": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idSector": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idsAsientos": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "DevolverLugaresRequest": {
+        "type": "object",
+        "properties": {
+          "entradas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Unidad"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "entradas"
+        ]
+      },
+      "Unidad": {
+        "type": "object",
+        "properties": {
+          "entradaId": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 0
+          },
+          "asientoId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "entradaId"
+        ]
+      },
+      "AsientoDTO": {
+        "type": "object",
+        "properties": {
+          "catalogoAsientoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fila": {
+            "type": "string"
+          },
+          "numero": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "InicializarInventarioRequest": {
+        "type": "object",
+        "properties": {
+          "idSector": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "esNumerado": {
+            "type": "boolean"
+          },
+          "capacidadTotal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "asientos": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/AsientoDTO"
+            }
+          }
+        }
+      },
+      "DisponibilidadResponse": {
+        "type": "object",
+        "properties": {
+          "idEvento": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "idSector": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "esNumerado": {
+            "type": "boolean"
+          },
+          "capacidadTotal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "disponibles": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "asientosLibres": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/DetalleAsientoResponse"
+            }
+          }
+        }
+      },
+      "ErrorHTTP": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
+  }
+}

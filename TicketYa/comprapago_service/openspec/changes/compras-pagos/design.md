@@ -1,5 +1,7 @@
 # Diseño técnico: Microservicio de Compras y Pagos
 
+> Antecedente OpenSpec conservado. Los cortes y planes anteriores se identifican como históricos: la versión actual tiene API Gateway y clientes REST para Eventos, Reservas y Entradas. Ver [arquitectura vigente](../../../../../docs/entrega1/arquitectura.md) y [pruebas registradas](../../../../../docs/entrega1/pruebas.md). Las marcas del plan histórico no deben interpretarse como diagnóstico del estado actual.
+
 ## Context
 
 El microservicio de Compras y Pagos forma parte de la arquitectura distribuida de TicketYa, compuesta por los microservicios de Eventos, Reservas, Compras y Pagos, Entradas y un API Gateway.
@@ -318,7 +320,7 @@ DevolucionService y DevolucionRegistroService implementan solicitud, consulta y
 resolución local; aprobar no invoca reintegros ni modifica entradas. Los endpoints
 se incorporan en 6.9; la autorización real queda pendiente de la integración de seguridad.
 El plazo se evalúa al solicitar (incluyendo exactamente 72 horas), no al resolver.
-La documentación operativa está en docs/devoluciones-6-1-6-4.md.
+La nota interna de ese corte no forma parte del repositorio; las reglas vigentes están en [historias y aceptación](../../../../../docs/entrega1/historias.md).
 
 #### Implementación 6.5–6.9
 
@@ -459,11 +461,11 @@ auxiliar independiente de las transacciones del dominio, para modelar reinicios.
 La recuperación es controlada repitiendo `POST /pagos` con la misma clave. Devuelve
 201 solo al crear el pago y 200 en repeticiones/recuperación. El turno vence a los
 dos minutos y se renueva en cada avance; una solicitud simultánea recibe 409.
-No se implementan scheduler, clientes REST reales ni Gateway en este alcance.
+En ese corte histórico no se implementaban scheduler, clientes REST ni Gateway; la versión integrada posterior sí incluye clientes REST y Gateway, sin worker general de recuperación.
 
 Los diagramas y contratos concretos están en `docs/flujo-compra.md`;
 el modelo en `docs/modelo-entidades.md` y el aislamiento de pruebas
-en `docs/pruebas.md`. Esta subsección conserva el corte histórico hasta 5.8; el estado actual incluye toda la sección 6 y mantiene pendiente la integración de la sección 7.
+en `docs/pruebas.md`. Esta subsección conserva el corte histórico hasta 5.8; el corte allí registrado incluía la sección 6; la integración REST y Gateway posterior está documentada en el paquete vigente.
 
 ### Preguntas para la integración futura
 

@@ -4,6 +4,9 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public class VenueRequestDTO {
+    private String city;
+    public String getCity() {return city;}
+    public void setCity(String city) {this.city=city;}
 
     @NotBlank(message = "El nombre del lugar no puede estar vacío")
     @Size(max = 150, message = "El nombre no puede superar los 150 caracteres")

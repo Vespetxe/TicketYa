@@ -1,0 +1,43 @@
+sequenceDiagram
+    actor C as Cliente
+    participant G as Gateway
+    participant E as Eventos
+    participant I as Inventario
+    participant P as Compras
+    participant S as Pasarela simulada en Compras
+    participant T as Entradas
+    Note over E,I: Inventario PREPARADO no reservable; PUBLICADO confirmado y habilitacion comercial completada
+    C->>G: GET disponibilidad
+    G->>I: GET disponibilidad evento sector
+    I-->>C: Asientos operativos libres via Gateway
+    C->>G: POST reservas con idsAsientos operativos
+    G->>I: Crear reserva
+    I->>I: Bloquear stock y guardar PENDIENTE con vencimiento
+    I-->>C: 201 idReserva via Gateway
+    C->>G: POST compras con reserva y seleccion exacta
+    G->>P: Crear compra
+    P->>E: GET evento y precios
+    P->>I: GET reserva
+    P->>P: Validar limite y guardar PENDIENTE e importe historico
+    P-->>C: 201 compra via Gateway
+    C->>G: POST pagos con clave estable y medio
+    G->>P: Procesar pago
+    P->>P: Turno durable y PROCESANDO etapa PAGO
+    P->>S: Cobrar importe con clave
+    S-->>P: APROBADO
+    P->>P: Guardar pago y etapa CONFIRMACION
+    P->>I: POST reservas id confirmar
+    I->>I: Bloqueo y PENDIENTE a CONFIRMADA
+    I-->>P: 200
+    P->>P: Guardar etapa EMISION
+    P->>T: POST internal tickets issue con orderId
+    T->>P: GET internal orders id
+    P-->>T: Proyeccion CONFIRMADA sin cancelacion solicitada
+    T->>T: Bloquear gate evento y lote orden; crear ticket UUID y QR por unidad
+    T-->>P: 201 lote creado o 200 lote existente
+    P->>P: COMPLETADA y FINALIZADA
+    P-->>C: Resultado APROBADO via Gateway
+    C->>G: GET tickets por orderId
+    G->>T: Consultar tickets
+    T-->>C: Entradas EMITIDA via Gateway
+    Note over P,T: Repetir la misma clave no duplica cobro ni lote

@@ -9,6 +9,10 @@ import lombok.*;
 @ToString
 public class AsientoDTO {
 
+    private Long catalogoAsientoId;
+
+    public AsientoDTO(String fila, Integer numero) { this.fila=fila; this.numero=numero; }
+
     private String fila;
     private Integer numero;
 }

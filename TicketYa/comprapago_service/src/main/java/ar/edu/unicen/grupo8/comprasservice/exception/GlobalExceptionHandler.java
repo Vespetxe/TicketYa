@@ -12,6 +12,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleStatus(org.springframework.web.server.ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(new ErrorResponse(ex.getStatusCode().value(),ex.getReason()));
+    }
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
@@ -23,7 +27,7 @@ public class GlobalExceptionHandler {
                 .map(e -> e.getField() + ": " + e.getDefaultMessage()).findFirst().orElse("Solicitud invalida"));
     }
     @ExceptionHandler({ConstraintViolationException.class, HandlerMethodValidationException.class,
-            MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class,
+            MissingServletRequestParameterException.class, MissingRequestHeaderException.class, MethodArgumentTypeMismatchException.class,
             HttpMessageNotReadableException.class})
     public ResponseEntity<ErrorResponse> handleSolicitud(Exception ex) {
         return respuesta(HttpStatus.BAD_REQUEST, "La solicitud contiene datos invalidos o incompletos");

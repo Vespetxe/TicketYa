@@ -1,0 +1,772 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TicketYa - Entradas - Entrega 1",
+    "version": "entrega-1",
+    "description": "Consulta publica y coordinacion interna. Los IDs de dominio se transportan como cadenas numericas; ticketId y qr son UUID. No incluye validacion de acceso QR."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8083"
+    }
+  ],
+  "paths": {
+    "/tickets": {
+      "get": {
+        "summary": "Consultar por exactamente uno de orderId o clientId",
+        "responses": {
+          "200": {
+            "description": "Operacion completada o repetida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                },
+                "example": [
+                  {
+                    "ticketId": "00000000-0000-4000-8000-000000000001",
+                    "qr": "00000000-0000-4000-8000-000000000002",
+                    "orderId": "1",
+                    "eventId": "1",
+                    "clientId": "1",
+                    "sectorId": "1",
+                    "seatId": "1",
+                    "status": "EMITIDA"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "INVALID_TICKET_QUERY",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "timestamp": "2030-12-01T21:00:00",
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "clientId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-visibility": "publica",
+        "operationId": "entradas_get_tickets",
+        "description": "Operacion implementada por entradas. Accesible por el Gateway."
+      }
+    },
+    "/internal/tickets/issue": {
+      "post": {
+        "summary": "Emitir el lote de una orden habilitada",
+        "responses": {
+          "200": {
+            "description": "Operacion completada o repetida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketIssuanceResult"
+                },
+                "example": {
+                  "tickets": [
+                    {
+                      "ticketId": "00000000-0000-4000-8000-000000000001",
+                      "qr": "00000000-0000-4000-8000-000000000002",
+                      "orderId": "1",
+                      "eventId": "1",
+                      "clientId": "1",
+                      "sectorId": "1",
+                      "seatId": "1",
+                      "status": "EMITIDA"
+                    }
+                  ],
+                  "created": true
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Lote creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketIssuanceResult"
+                },
+                "example": {
+                  "tickets": [
+                    {
+                      "ticketId": "00000000-0000-4000-8000-000000000001",
+                      "qr": "00000000-0000-4000-8000-000000000002",
+                      "orderId": "1",
+                      "eventId": "1",
+                      "clientId": "1",
+                      "sectorId": "1",
+                      "seatId": "1",
+                      "status": "EMITIDA"
+                    }
+                  ],
+                  "created": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "INVALID_REQUEST",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "ORDER_NOT_FOUND",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Orden no habilitada o cancelada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "ORDER_NOT_CONFIRMED",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Seleccion incompatible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "INVALID_ORDER",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Compras no disponible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "ORDERS_UNAVAILABLE",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "timestamp": "2030-12-01T21:00:00",
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueTicketsRequest"
+              },
+              "example": {
+                "orderId": "1"
+              }
+            }
+          }
+        },
+        "x-visibility": "interna",
+        "operationId": "entradas_post_internal_tickets_issue",
+        "description": "Operacion implementada por entradas. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/internal/tickets/{ticketId}/status": {
+      "patch": {
+        "summary": "Anular o registrar reintegro de un ticket",
+        "responses": {
+          "200": {
+            "description": "Operacion completada o repetida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                },
+                "example": {
+                  "ticketId": "00000000-0000-4000-8000-000000000001",
+                  "qr": "00000000-0000-4000-8000-000000000002",
+                  "orderId": "1",
+                  "eventId": "1",
+                  "clientId": "1",
+                  "sectorId": "1",
+                  "seatId": "1",
+                  "status": "EMITIDA"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "INVALID_REQUEST",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "TICKET_NOT_FOUND",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "timestamp": "2030-12-01T21:00:00",
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketStatusRequest"
+              },
+              "example": {
+                "orderId": "1",
+                "status": "ANULADA"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ticketId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "00000000-0000-4000-8000-000000000001"
+          }
+        ],
+        "x-visibility": "interna",
+        "operationId": "entradas_patch_internal_tickets_ticketId_status",
+        "description": "Operacion implementada por entradas. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/internal/tickets/status": {
+      "patch": {
+        "summary": "Cambiar estado por orden y evento",
+        "responses": {
+          "200": {
+            "description": "Operacion completada o repetida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                },
+                "example": [
+                  {
+                    "ticketId": "00000000-0000-4000-8000-000000000001",
+                    "qr": "00000000-0000-4000-8000-000000000002",
+                    "orderId": "1",
+                    "eventId": "1",
+                    "clientId": "1",
+                    "sectorId": "1",
+                    "seatId": "1",
+                    "status": "EMITIDA"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud invalida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "code": "INVALID_REQUEST",
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "timestamp": "2030-12-01T21:00:00",
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderEventStatusRequest"
+              },
+              "example": {
+                "orderId": "1",
+                "eventId": "1",
+                "status": "ANULADA"
+              }
+            }
+          }
+        },
+        "x-visibility": "interna",
+        "operationId": "entradas_patch_internal_tickets_status",
+        "description": "Operacion implementada por entradas. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/internal/tickets/orders/{id}/annul": {
+      "post": {
+        "summary": "Anular orden y registrar barrera durable aunque no existan tickets",
+        "responses": {
+          "200": {
+            "description": "Operacion completada o repetida"
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "timestamp": "2030-12-01T21:00:00",
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "x-visibility": "interna",
+        "operationId": "entradas_post_internal_tickets_orders_id_annul",
+        "description": "Operacion implementada por entradas. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    },
+    "/internal/events/{id}/cancel-emission": {
+      "post": {
+        "summary": "Bloquear nuevas emisiones del evento; espera transacciones de emision previas",
+        "responses": {
+          "200": {
+            "description": "Operacion completada o repetida"
+          },
+          "500": {
+            "description": "Error interno; no interpretar como ausencia de efectos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorHTTP"
+                    }
+                  ]
+                },
+                "example": {
+                  "timestamp": "2030-12-01T21:00:00",
+                  "status": 500,
+                  "message": "Operacion no completada"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "x-visibility": "interna",
+        "operationId": "entradas_post_internal_events_id_cancel_emission",
+        "description": "Operacion implementada por entradas. Llamada directa entre servicios; excluida del Gateway normal."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "sectorId": {
+            "type": "string"
+          },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "qr": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seatId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "EMITIDA",
+              "ANULADA",
+              "REINTEGRADA"
+            ]
+          }
+        },
+        "required": [
+          "ticketId",
+          "qr",
+          "orderId",
+          "eventId",
+          "clientId",
+          "sectorId",
+          "status"
+        ]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "IssueTicketsRequest": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "orderId"
+        ]
+      },
+      "TicketIssuanceResult": {
+        "type": "object",
+        "properties": {
+          "tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ticket"
+            }
+          },
+          "created": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "tickets",
+          "created"
+        ]
+      },
+      "TicketStatusRequest": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ANULADA",
+              "REINTEGRADA"
+            ]
+          }
+        },
+        "required": [
+          "orderId",
+          "status"
+        ]
+      },
+      "OrderEventStatusRequest": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ANULADA",
+              "REINTEGRADA"
+            ]
+          }
+        },
+        "required": [
+          "orderId",
+          "eventId",
+          "status"
+        ]
+      },
+      "ErrorHTTP": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
+  }
+}

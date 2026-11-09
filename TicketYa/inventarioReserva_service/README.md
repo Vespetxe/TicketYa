@@ -1,5 +1,7 @@
 # Guía de Pruebas de API REST - Microservicio Inventario y Reservas
 
+> **Antecedente histórico.** Los ejemplos de esta página usan IDs fijos y contratos anteriores. Para Entrega 1 integrada usar el [README general](../../README.md), [OpenAPI vigente](../../docs/entrega1/openapi/inventario.json) y [Postman dinámico](../../docs/entrega1/demostracion.md). Una inicialización repetida compatible es idempotente; las devoluciones requieren identidad estable por entrada y reserva; los asientos operativos difieren de los del catálogo. La omisión de `idCliente` puede dar 500 por el manejador genérico actual. Las secciones originales se conservan como antecedentes, no como instrucciones vigentes.
+
 **Base URL:** `http://localhost:8082`
 
 ---

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 @Component
 @Primary
+@org.springframework.context.annotation.Profile("!integracion")
 public class EventoClientSimulado implements EventoClient {
 
     public record Programacion(java.time.LocalDateTime fechaInicio, boolean cancelado) {

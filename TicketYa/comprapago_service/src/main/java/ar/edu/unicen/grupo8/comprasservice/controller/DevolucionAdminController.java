@@ -19,6 +19,10 @@ import java.util.List;
         @ApiResponse(responseCode="409", description="Estado, clave o procesamiento incompatible"),
         @ApiResponse(responseCode="503", description="Operacion externa no confirmada. Consultar y reintentar con la misma clave")})
 public class DevolucionAdminController {
+    @ModelAttribute
+    public void identificarAdministrador(@RequestHeader("X-Admin-Id") Long administradorId) {
+        if(administradorId==null || administradorId<=0)throw new IllegalArgumentException("X-Admin-Id debe identificar un administrador con ID positivo");
+    }
     private final DevolucionService devoluciones;
     private final ReintegroService reintegros;
     public DevolucionAdminController(DevolucionService devoluciones, ReintegroService reintegros) {

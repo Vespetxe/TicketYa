@@ -25,7 +25,7 @@ public class PasarelaPagoSimuladaService implements PasarelaPagoService {
             if (anterior != null) { compatible(anterior, importe); return anterior; }
             return new Operacion(importe, importe.compareTo(new BigDecimal("100000")) <= 0, UUID.randomUUID().toString());
         });
-        if ("simular-timeout".equals(clave)) throw new ComunicacionPasarelaException("No se pudo obtener una respuesta de la pasarela");
+        if (clave.startsWith("simular-timeout")) throw new ComunicacionPasarelaException("No se pudo obtener una respuesta de la pasarela");
         return resultado.resultado();
     }
     @Override

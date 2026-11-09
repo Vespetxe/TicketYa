@@ -1,0 +1,47 @@
+erDiagram
+    asiento {
+        bigint id_asiento PK "required"
+        bigint catalogo_asiento_id "nullable"
+        enum estado "required"
+        varchar fila "required"
+        int numero "required"
+        bigint id_inventario_sector FK "required"
+    }
+    control_evento {
+        bigint id_evento PK "required"
+        enum estado "nullable"
+    }
+    detalle_reserva {
+        bigint id_detalle_reserva PK "required"
+        bigint id_asiento FK "nullable"
+        bigint id_reserva FK "required"
+    }
+    inventario_sector {
+        bigint id_inventario_sector PK "required"
+        int capacidad_total "required"
+        int disponibles "required"
+        bit es_numerado "required"
+        enum estado "required"
+        bigint id_evento "required"
+        bigint id_sector "required"
+    }
+    lugares_devueltos {
+        bigint id PK "required"
+        bigint asiento_id "nullable"
+        varchar entrada_id UK "required"
+        bigint reserva_id_reserva FK "required"
+    }
+    reserva {
+        bigint id_reserva PK "required"
+        int cantidad "required"
+        enum estado "required"
+        datetime fecha_creacion "required"
+        datetime fecha_expiracion "required"
+        bigint id_cliente "required"
+        bigint id_evento "required"
+        bigint id_sector "required"
+    }
+    inventario_sector ||--o{ asiento : "id_inventario_sector"
+    reserva ||--o{ detalle_reserva : "id_reserva"
+    asiento |o--o{ detalle_reserva : "id_asiento"
+    reserva ||--o{ lugares_devueltos : "reserva_id_reserva"

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/sectors")
-@Tag(name = "Sectores - Contrato Interno", description = "Endpoints de consulta consumidos síncronamente por el microservicio de Inventario y Reservas")
+@Tag(name = "Asientos de catalogo", description = "Consulta de grilla accesible por Gateway; no sustituye disponibilidad operativa")
 public class SectorController {
 
     private final SectorRepository sectorRepository;
@@ -33,15 +33,16 @@ public class SectorController {
     @GetMapping("/{sectorId}/seats")
     @Operation(
             summary = "Obtener lista de asientos de un sector numerado",
-            description = "Expone el listado completo de entidades `Seat` (con sus `seatId`) asociadas a un sector numerado. Este contrato es consumido por el servicio de Inventario/Reservas al publicar un evento para popular el stock inicial."
+            description = "Devuelve seatId, fila y numero de la grilla del catalogo. Para reservar utilizar idAsiento de disponibilidad en Inventario."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de asientos devuelta exitosamente",
-                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Seat.class)))),
+                    content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = SeatResponseDTO.class)))),
             @ApiResponse(responseCode = "404", description = "Sector no encontrado",
                     content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"timestamp\":\"2026-03-30T10:00:00Z\",\"status\":404,\"message\":\"Sector no encontrado con ID: 45\"}")))
     })
 
+    @org.springframework.transaction.annotation.Transactional(readOnly=true)
     public ResponseEntity<List<SeatResponseDTO>> getSeatsBySector(@Parameter(description = "ID del sector a consultar", example = "2")@PathVariable Long sectorId) {
         Sector sector = sectorRepository.findById(sectorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Sector no encontrado con ID: " + sectorId));

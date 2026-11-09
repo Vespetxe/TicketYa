@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-@Table(indexes = {
+@Table(uniqueConstraints = @jakarta.persistence.UniqueConstraint(name = "uk_inventario_evento_sector", columnNames = {"idEvento", "idSector"}), indexes = {
         @Index(name = "idx_evento_sector", columnList = "idEvento, idSector")
 })
 public class InventarioSector {

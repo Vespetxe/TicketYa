@@ -1,5 +1,7 @@
 # Propuesta: Microservicio de Compras y Pagos
 
+> Antecedente OpenSpec conservado. Los cortes y planes anteriores se identifican como históricos: la versión actual tiene API Gateway y clientes REST para Eventos, Reservas y Entradas. Ver [arquitectura vigente](../../../../../docs/entrega1/arquitectura.md) y [pruebas registradas](../../../../../docs/entrega1/pruebas.md). Las marcas del plan histórico no deben interpretarse como diagnóstico del estado actual.
+
 ## ¿Por qué es necesario?
 
 TicketYa necesita gestionar el proceso de compra de entradas de manera confiable, coordinando las reservas temporales, el procesamiento de pagos y la emisión de entradas mediante distintos microservicios.

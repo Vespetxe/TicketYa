@@ -81,7 +81,7 @@ class InventarioControllerTest {
         Long idSector = 999L;
 
         when(inventarioService.consultarDisponibilidad(idEvento, idSector))
-                .thenThrow(new RuntimeException("Inventario no encontrado"));
+                .thenThrow(new example.microservicio_inventario_reservas.exceptions.RecursoNoEncontradoException("Inventario no encontrado"));
 
         mockMvc.perform(get("/disponibilidad/eventos/{idEvento}/sectores/{idSector}", idEvento, idSector))
                 .andExpect(status().isNotFound())

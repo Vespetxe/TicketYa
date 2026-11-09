@@ -19,6 +19,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Tag(name = "Inventario", description = "Endpoints para la gestión del stock, aforos, grilla de asientos y cancelaciones del inventario de eventos")
 public class InventarioController {
+    @PostMapping("/internal/eventos/{id}/publicar") public void publicar(@PathVariable Long id){inventarioService.publicar(id);}
+    @PostMapping("/internal/eventos/{id}/habilitar") public void habilitar(@PathVariable Long id){inventarioService.habilitar(id);}
+    @PostMapping("/internal/eventos/{id}/suspender")
+    public void suspender(@PathVariable Long id) {inventarioService.suspender(id);}
 
     @Autowired
     private InventarioService inventarioService;

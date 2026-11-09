@@ -7,9 +7,14 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class LiberarDevolucionRequest {
+
+    private Long idReserva;
+    private List<String> entradasIds;
+    public LiberarDevolucionRequest(Long idEvento, Long idSector, Integer cantidad, List<Long> idsAsientos) {
+        this.idEvento=idEvento; this.idSector=idSector; this.cantidad=cantidad; this.idsAsientos=idsAsientos;
+    }
 
     private Long idEvento;
     private Long idSector;

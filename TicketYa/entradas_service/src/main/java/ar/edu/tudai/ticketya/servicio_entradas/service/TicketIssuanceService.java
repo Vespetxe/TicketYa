@@ -36,7 +36,10 @@ public class TicketIssuanceService {
     }
     private List<Ticket> existingTickets(String orderId) {
         return batches.findByOrderId(orderId)
-                .map(batch -> tickets.findAllByBatch_OrderIdOrderByTicketId(orderId))
+                .map(batch -> {
+                    if(batch.isCancelled())throw new ar.edu.tudai.ticketya.servicio_entradas.integration.OrderNotConfirmedException(orderId);
+                    return tickets.findAllByBatch_OrderIdOrderByTicketId(orderId);
+                })
                 .orElse(null);
     }
     private TicketIssuanceResult result(List<Ticket> values, boolean created) {

@@ -1,8 +1,6 @@
 # Informe de finalización — Compras y Pagos hasta 5.8
 
-> Corte histórico del 2026-11-05, limitado a secciones 1–5. No describe el estado
-> actual: las secciones 1–6 están implementadas con simuladores; la integración de
-> sección 7 permanece pendiente. Consultar flujo-compra.md y tasks.md para el estado vigente.
+> Corte histórico del 2026-11-05, limitado a secciones 1–5. No describe la versión integrada actual, que cuenta con Gateway y clientes REST. Consultar [arquitectura vigente](../../../docs/entrega1/arquitectura.md) y [evidencia consolidada](../../../docs/entrega1/pruebas.md). Se conservan los resultados de aquella ejecución como historial.
 
 Fecha: 2026-11-05. Alcance: secciones 1 a 5 de openspec/changes/compras-pagos.
 
@@ -98,7 +96,7 @@ Los fallos encontrados durante el desarrollo se corrigieron; no se omitieron tes
 
 ## Límites restantes
 
-- Secciones 6 y 7 fuera del alcance y pendientes en OpenSpec. No hay Gateway ni clientes REST reales.
+- En aquel corte las secciones 6 y 7 estaban fuera de alcance y todavía no había Gateway ni clientes REST; esa limitación fue superada por la integración actual.
 - Recuperación controlada mediante repetición de POST /pagos con la misma clave;
   no existe recuperación programada. Tras una caída se espera el vencimiento del turno.
 - Un reintegro definitivamente rechazado requiere intervención manual: queda RECHAZADO,
@@ -116,64 +114,64 @@ Los fallos encontrados durante el desarrollo se corrigieron; no se omitieron tes
 
 ## Archivos creados
 
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/cliente/EventoClientSimuladoTest.java
-- compras-service/docs/flujo-compra.md
-- compras-service/docs/informe-finalizacion.md
-- compras-service/docs/pruebas.md
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/AlmacenSimulado.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/AlmacenSimuladoJpa.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/config/AplicacionConfig.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/PagoDTO.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/OperacionSimulada.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/enums/EtapaCompra.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/exception/OperacionExternaRechazadaException.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/CompraRegistroService.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/PagoRegistroService.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/SeleccionReserva.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/EntornoPruebasSeguro.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/EntornoPruebasSeguroTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/controller/ApiIntegracionTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/FlujoCompraIntegracionTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/SeleccionReservaTest.java
-- compras-service/src/test/resources/META-INF/spring.factories
-- compras-service/src/test/resources/application.properties
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/cliente/EventoClientSimuladoTest.java
+- TicketYa/comprapago_service/docs/flujo-compra.md
+- TicketYa/comprapago_service/docs/informe-finalizacion.md
+- TicketYa/comprapago_service/docs/pruebas.md
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/AlmacenSimulado.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/AlmacenSimuladoJpa.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/config/AplicacionConfig.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/PagoDTO.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/OperacionSimulada.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/enums/EtapaCompra.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/exception/OperacionExternaRechazadaException.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/CompraRegistroService.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/PagoRegistroService.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/SeleccionReserva.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/EntornoPruebasSeguro.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/EntornoPruebasSeguroTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/controller/ApiIntegracionTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/FlujoCompraIntegracionTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/SeleccionReservaTest.java
+- TicketYa/comprapago_service/src/test/resources/META-INF/spring.factories
+- TicketYa/comprapago_service/src/test/resources/application.properties
 
 ## Archivos modificados
 
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/EventoClientSimulado.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/enums/EstadoPago.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/entity/enums/EstadoPagoTest.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/EventoClientSimulado.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/enums/EstadoPago.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/entity/enums/EstadoPagoTest.java
 - openspec/changes/compras-pagos/specs/coordinacion-reservas-entradas/spec.md
 
-- compras-service/docs/modelo-entidades.md
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/EntradaClientSimulado.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/ReservaClient.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/ReservaClientSimulado.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/controller/CompraController.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/controller/PagoController.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/controller/PagoExceptionHandler.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/CompraDTO.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/CrearCompraDTO.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/DetalleCompraDTO.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/ProcesarPagoDTO.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/ReservaDTO.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/Compra.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/Pago.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/exception/GlobalExceptionHandler.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/repository/CompraRepository.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/CompraService.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/PagoService.java
-- compras-service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/PasarelaPagoSimuladaService.java
-- compras-service/src/main/resources/application-test.properties
-- compras-service/src/main/resources/application.properties
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/cliente/EntradaClientSimuladoTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/cliente/ReservaClientSimuladoTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/controller/PagoControllerTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/dto/CrearCompraDTOTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/repository/ReintegroRepositoryTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/CompraIntegracionTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/CompraServiceTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/PagoServiceTest.java
-- compras-service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/PasarelaPagoSimuladaServiceTest.java
+- TicketYa/comprapago_service/docs/modelo-entidades.md
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/EntradaClientSimulado.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/ReservaClient.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/client/ReservaClientSimulado.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/controller/CompraController.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/controller/PagoController.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/controller/PagoExceptionHandler.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/CompraDTO.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/CrearCompraDTO.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/DetalleCompraDTO.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/ProcesarPagoDTO.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/dto/ReservaDTO.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/Compra.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/entity/Pago.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/exception/GlobalExceptionHandler.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/repository/CompraRepository.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/CompraService.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/PagoService.java
+- TicketYa/comprapago_service/src/main/java/ar/edu/unicen/grupo8/comprasservice/service/PasarelaPagoSimuladaService.java
+- TicketYa/comprapago_service/src/main/resources/application-test.properties
+- TicketYa/comprapago_service/src/main/resources/application.properties
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/cliente/EntradaClientSimuladoTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/cliente/ReservaClientSimuladoTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/controller/PagoControllerTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/dto/CrearCompraDTOTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/repository/ReintegroRepositoryTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/CompraIntegracionTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/CompraServiceTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/PagoServiceTest.java
+- TicketYa/comprapago_service/src/test/java/ar/edu/unicen/grupo8/comprasservice/service/PasarelaPagoSimuladaServiceTest.java
 - openspec/changes/compras-pagos/design.md
 - openspec/changes/compras-pagos/tasks.md

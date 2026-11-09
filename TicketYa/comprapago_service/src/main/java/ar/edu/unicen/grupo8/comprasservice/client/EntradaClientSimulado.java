@@ -10,6 +10,7 @@ import java.util.*;
 
 @Component
 @Primary
+@org.springframework.context.annotation.Profile("!integracion")
 public class EntradaClientSimulado implements EntradaClient {
     public record Emision(Long evento, Long cliente, List<DetalleEmisionDTO> detalles, List<EntradaDTO> entradas, boolean anulada) { }
     private final AlmacenSimulado almacen;

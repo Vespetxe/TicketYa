@@ -1,0 +1,38 @@
+sequenceDiagram
+    actor A as Administrador
+    participant G as Gateway
+    participant E as Eventos
+    participant T as Entradas
+    participant I as Inventario
+    participant P as Compras
+    participant S as Pasarela simulada en Compras
+    A->>G: PATCH evento cancel con rol ADMIN y X-Admin-Id positivo
+    G->>E: Cancelar
+    E->>T: POST internal events id cancel-emission
+    T->>T: Gate BD espera emision previa y persiste bloqueo
+    T-->>E: 200 barrera confirmada
+    E->>E: Registrar CANCELADO
+    E->>I: POST eventos id cancelar-inventario
+    I->>I: Bloquear stock y reservas
+    E->>P: POST admin eventos id cancelacion con X-Admin-Id recibido
+    P->>E: Verificar CANCELADO
+    P->>P: Persistir cancelacionSolicitada de compras en curso
+    opt Pago PROCESANDO o incierto
+        P->>S: Recuperar con clave y medio originales
+        S-->>P: Efecto conocido o todavia incierto
+        P->>T: Anular lote incluso si aun no existe
+        P->>S: Reintegrar cobro confirmado una sola vez
+        P->>I: Compensar sin reofrecer stock cancelado
+    end
+    opt Ventas completadas
+        P->>S: Reintegrar entradas vigentes por precio historico
+        P->>T: Anular entradas
+    end
+    alt Todas las compras resueltas
+        P-->>E: 200
+        E-->>A: Evento CANCELADO via Gateway
+    else Turno ocupado o dependencia pendiente
+        P-->>E: 202 pendientes
+        E-->>A: 503 recuperable via Gateway
+        Note over A,P: Repetir cancelacion; no crear otra identidad financiera
+    end

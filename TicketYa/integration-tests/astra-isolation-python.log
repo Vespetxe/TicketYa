@@ -1,0 +1,9 @@
+test_all_databases_and_outbound_destinations_are_required (test_isolation.IsolationTest.test_all_databases_and_outbound_destinations_are_required) ... ok
+test_each_mixed_or_missing_outbound_destination_aborts_before_first_post (test_isolation.IsolationTest.test_each_mixed_or_missing_outbound_destination_aborts_before_first_post) ... ok
+test_missing_token_never_contacts_any_service (test_isolation.IsolationTest.test_missing_token_never_contacts_any_service) ... ok
+test_wrong_database_aborts_before_mutations (test_isolation.IsolationTest.test_wrong_database_aborts_before_mutations) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.010s
+
+OK

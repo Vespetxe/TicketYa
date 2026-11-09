@@ -1,0 +1,29 @@
+sequenceDiagram
+    actor C as Cliente
+    actor A as Administrador
+    participant G as Gateway
+    participant P as Compras
+    participant T as Entradas
+    participant S as Pasarela simulada en Compras
+    participant I as Inventario
+    C->>G: GET compras id entradas
+    G->>P: Consultar seleccion por unidad
+    P->>T: GET tickets por orderId
+    T-->>P: UUID, sector, asiento y estado
+    P->>P: Resolver UUID a entradaId numerico persistido
+    P-->>C: entradaId y ticketId con asiento via Gateway
+    C->>G: POST devoluciones con entradaId del asiento elegido
+    G->>P: Validar titularidad, vigencia y al menos 72 horas
+    P-->>C: Solicitud PENDIENTE via Gateway
+    A->>G: Aprobar con motivo y X-Admin-Id positivo
+    G->>P: POST admin devoluciones id aprobar
+    P-->>A: APROBADA sin movimiento financiero via Gateway
+    A->>G: Procesar con clave estable e importe exacto
+    G->>P: POST admin devoluciones id procesar
+    P->>S: Reintegrar solo precio historico seleccionado
+    S-->>P: Reintegro confirmado
+    P->>T: PATCH UUID seleccionado status ANULADA
+    P->>I: Registrar devolucion por identidad estable
+    I->>I: Reponer solo el asiento elegido si corresponde
+    P-->>A: FINALIZADA via Gateway
+    Note over P,I: Repeticion no duplica reintegro ni stock; otros tickets siguen EMITIDA

@@ -269,13 +269,27 @@ class ReintegroIntegracionTest {
         assertEquals(EtapaCompra.FINALIZADA, cancelada.getEtapa()); assertEquals(0, reintegros.count());
         verify(pasarela, never()).procesarPago(any(), any()); assertEquals("LIBERADA", reservas.consultarReserva(c.getReservaId()).estado());
     }
-    @Test void cancelacionReportaPagoEnProcesoYLoRecogeTrasRecuperarlo() {
+    @Test void cancelacionRecuperaPagoEnProcesoSinPostDePagoSeparado() {
         var c = crear(false); doThrow(new ComunicacionPasarelaException("Sin confirmacion")).when(reservas).confirmarReserva(c.getReservaId());
         pagos.procesarPago(c.getId(), "pago-devolucion", MedioPago.TARJETA_DEBITO);
-        var r = flujo.cancelarEvento(20L); assertEquals(List.of(c.getId()), r.comprasPendientes()); assertEquals(0, reintegros.count());
-        reset(reservas); pagos.procesarPago(c.getId(), "pago-devolucion", MedioPago.TARJETA_DEBITO);
+        var r = flujo.cancelarEvento(20L); assertTrue(r.comprasPendientes().isEmpty()); assertEquals(1, reintegros.count());
         var recuperada = flujo.cancelarEvento(20L); assertTrue(recuperada.comprasPendientes().isEmpty());
-        completada(recuperada.devoluciones().get(0)); assertEquals(1, reintegros.count());
+        assertEquals(EstadoCompra.FALLIDA,compras.obtenerCompraPorId(c.getId()).getEstado());
+        assertEquals(EstadoPago.REINTEGRADO_TOTAL,pagos.obtenerPagosPorCompra(c.getId()).get(0).getEstado());
+        assertEquals(1, reintegros.count());assertTrue(entradas.consultarEntradas(c.getId()).isEmpty());
+    }
+    @Test void cancelacionesConcurrentesRecuperanUnSoloCobroIncierto() throws Exception {
+        var c=crear(false);pagos.procesarPago(c.getId(),"simular-timeout",MedioPago.TARJETA_DEBITO);
+        var executor=Executors.newFixedThreadPool(2);var inicio=new CountDownLatch(1);
+        try {
+            var a=executor.submit(()->{inicio.await();return flujo.cancelarEvento(20L);});
+            var b=executor.submit(()->{inicio.await();return flujo.cancelarEvento(20L);});inicio.countDown();
+            a.get(20,TimeUnit.SECONDS);b.get(20,TimeUnit.SECONDS);
+            assertTrue(flujo.cancelarEvento(20L).comprasPendientes().isEmpty());
+            assertEquals(EstadoCompra.FALLIDA,compras.obtenerCompraPorId(c.getId()).getEstado());
+            assertEquals(EstadoPago.REINTEGRADO_TOTAL,pagos.obtenerPagosPorCompra(c.getId()).get(0).getEstado());
+            assertEquals(1,reintegros.count());assertTrue(entradas.consultarEntradas(c.getId()).isEmpty());
+        }finally{executor.shutdownNow();}
     }
 
     private CrearCompraDTO nuevaSolicitud(Long reservaId, int cantidad) {

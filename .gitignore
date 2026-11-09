@@ -1,0 +1,27 @@
+# Builds y recursos temporales; los target ya versionados requieren revision futura.
+**/target/
+**/src.rar
+**/__pycache__/
+*.py[cod]
+.idea/
+**/*.log
+# Evidencia seleccionada, sin secretos; no son logs de arranque con configuracion.
+!TicketYa/integration-tests/close-run.log
+!TicketYa/integration-tests/astra-run.log
+!TicketYa/integration-tests/astra-postman.log
+!TicketYa/integration-tests/astra-isolation-python.log
+**/.env
+**/.env.*
+!**/.env.example
+# Material local de preparacion: se conserva en disco, fuera del entregable.
+/docs/entrega1/cierre-astra.md
+/docs/entrega1/preparacion-git.md
+/docs/entrega1/manifiesto-git.json
+/docs/entrega1/revision-indice.json
+/docs/entrega1/credenciales-configuracion.json
+/docs/entrega1/tools/preparar_manifiesto_git.py
+/docs/entrega1/tools/verificar_indice.py
+/TicketYa/HELP.md
+/TicketYa/inventarioReserva_service/HELP.md
+/TicketYa/integration-tests/start_astra_tests.ps1
+/TicketYa/integration-tests/registrar_cierre.py

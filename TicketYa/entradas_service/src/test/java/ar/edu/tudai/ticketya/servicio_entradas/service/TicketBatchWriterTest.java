@@ -16,7 +16,7 @@ class TicketBatchWriterTest {
         TicketRepository tickets = mock(TicketRepository.class);
         when(batches.saveAndFlush(any())).thenAnswer(call -> call.getArgument(0));
         when(tickets.saveAllAndFlush(any())).thenAnswer(call -> call.getArgument(0));
-        TicketBatchWriter writer = new TicketBatchWriter(batches, tickets);
+        TicketBatchWriter writer = new TicketBatchWriter(batches, tickets,mock(EmissionGateService.class));
         OrderSnapshot order = new OrderSnapshot("order-1", "client-1", "CONFIRMADA", List.of(
                 new OrderItemSnapshot("event-1", "platea", "seat-12", 1),
                 new OrderItemSnapshot("event-1", "campo", null, 2)));
@@ -32,7 +32,7 @@ class TicketBatchWriterTest {
     }
     @Test void rejectsNumberedSeatLineWithMultipleQuantity() {
         TicketBatchRepository batches = mock(TicketBatchRepository.class);
-        TicketBatchWriter writer = new TicketBatchWriter(batches, mock(TicketRepository.class));
+        TicketBatchWriter writer = new TicketBatchWriter(batches, mock(TicketRepository.class),mock(EmissionGateService.class));
         OrderSnapshot order = new OrderSnapshot("order-1", "client-1", "CONFIRMADA",
                 List.of(new OrderItemSnapshot("event-1", "platea", "seat-12", 2)));
         assertThrows(RuntimeException.class, () -> writer.create(order));

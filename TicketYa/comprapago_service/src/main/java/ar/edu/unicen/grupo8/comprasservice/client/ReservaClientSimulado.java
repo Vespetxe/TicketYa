@@ -10,6 +10,7 @@ import java.util.List;
 
 @Component
 @Primary
+@org.springframework.context.annotation.Profile("!integracion")
 public class ReservaClientSimulado implements ReservaClient {
     private final AlmacenSimulado almacen;
     private final Clock clock;

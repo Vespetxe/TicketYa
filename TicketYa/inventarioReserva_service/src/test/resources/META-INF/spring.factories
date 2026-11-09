@@ -1,0 +1,1 @@
+org.springframework.context.ApplicationContextInitializer=example.microservicio_inventario_reservas.EntornoPruebasSeguro

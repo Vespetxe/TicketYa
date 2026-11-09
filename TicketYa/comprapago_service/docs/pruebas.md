@@ -1,5 +1,7 @@
 # Verificación local aislada
 
+> Evidencia histórica del servicio con simuladores. La ejecución integrada vigente y las instrucciones desde la raíz del repositorio están en [pruebas de Entrega 1](../../../docs/entrega1/pruebas.md). Los conteos siguientes no son nuevas ejecuciones.
+
 Requisitos: JDK 21, Docker y Maven (o mvnw.cmd). No se necesita DB_PASSWORD para tests.
 
 El classpath de pruebas contiene su propio application.properties y activa test.
@@ -17,7 +19,7 @@ docker exec ticketya-compras-tests mysqladmin ping -uroot -pticketya-test-only
 Esperar a que mysqladmin indique que el servidor está disponible. La contraseña mostrada
 es exclusivamente del contenedor de tests.
 
-Desde compras-service:
+Desde `TicketYa/comprapago_service` (raíz del servicio):
 
 ```powershell
 .\mvnw.cmd clean compile

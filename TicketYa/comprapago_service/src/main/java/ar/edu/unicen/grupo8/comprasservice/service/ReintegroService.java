@@ -16,6 +16,7 @@ import java.util.*;
 @Validated
 @Transactional(propagation=Propagation.NEVER)
 public class ReintegroService {
+    @org.springframework.beans.factory.annotation.Autowired private PagoService pagos;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ReintegroService.class);
     private final ReintegroRegistroService registro;
     private final DevolucionRegistroService devoluciones;
@@ -66,7 +67,7 @@ public class ReintegroService {
             }
             if (turno.resultado().etapa() == EtapaDevolucion.LIBERACION) {
                 // El contrato real deberá verificar también en Reservas la disponibilidad del evento.
-                if (!turno.resultado().cancelacionEvento() && eventos.eventoValido(turno.resultado().devolucion().eventoId())
+                if (!turno.resultado().cancelacionEvento() && !eventos.eventoCancelado(turno.resultado().devolucion().eventoId())
                         && eventos.obtenerFechaInicio(turno.resultado().devolucion().eventoId()).isAfter(java.time.LocalDateTime.now(clock))) {
                     var tickets = seleccionConfirmada(turno, ids);
                     if (tickets.stream().anyMatch(e -> !"ANULADA".equals(e.estado())))
@@ -113,8 +114,9 @@ public class ReintegroService {
             try {
                 var compra = compras.obtenerCompraPorId(compraId);
                 if (compra.getEstado() == EstadoCompra.PROCESANDO) {
-                    // Primero resolver el pago existente; repetir esta notificación recogerá su resultado.
-                    pendientes.add(compraId); continue;
+                    pagos.recuperarCancelacion(compraId);
+                    compra=compras.obtenerCompraPorId(compraId);
+                    if(compra.getEstado()==EstadoCompra.PROCESANDO) {pendientes.add(compraId);continue;}
                 }
                 if (compra.getEstado() == EstadoCompra.PENDIENTE || compra.getEstado() == EstadoCompra.CANCELADA) {
                     var cancelada = compras.cancelarCompra(compraId);

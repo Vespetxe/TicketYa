@@ -1,5 +1,7 @@
 # Tasks
 
+> Antecedente OpenSpec conservado. Los cortes y planes anteriores se identifican como históricos: la versión actual tiene API Gateway y clientes REST para Eventos, Reservas y Entradas. Ver [arquitectura vigente](../../../../../docs/entrega1/arquitectura.md) y [pruebas registradas](../../../../../docs/entrega1/pruebas.md). Las marcas del plan histórico no deben interpretarse como diagnóstico del estado actual.
+
 ## 1. Creación y configuración del microservicio
 
 - [x] 1.1 Crear el proyecto `compras-service` utilizando Spring Boot, Java y Maven. Verificar que el proyecto compile mediante `mvn clean compile`.
@@ -82,7 +84,7 @@ errores ni omisiones sobre MySQL aislado en 127.0.0.1:33079/ticketya_compras_tes
 Incluye DTO, titularidad, selección, importes históricos, solicitudes simultáneas,
 72 horas con reloj UTC controlado, decisiones concurrentes e idempotentes y ausencia
 de efectos financieros. Decisiones confirmadas y alcance en
-`docs/devoluciones-6-1-6-4.md`. No se implementaron 6.5–6.9 ni sección 7.
+una nota interna del corte 6.1–6.4 (no incluida en el repositorio). No se implementaron 6.5–6.9 ni sección 7.
 
 Verificación 6.5–6.9 (2026-11-07): compilación y `mvn -o verify` correctos,
 268 pruebas sin fallos, errores ni omisiones: las 227 anteriores y 41 nuevas
@@ -93,7 +95,7 @@ perdidas, turnos vencidos, anulación/liberación selectivas y cancelaciones rep
 múltiples y recuperables. Las decisiones de reintegro completo por solicitud y
 cancelación sin reofrecer lugares están documentadas en design.md y flujo-compra.md.
 La nota anterior corresponde al corte histórico 6.1–6.4; esta entrega completa 6.5–6.9.
-No se implementó sección 7 ni clientes reales, Gateway o autenticación.
+En aquella ejecución aún no se habían integrado los clientes reales ni Gateway. La integración actual posterior los incluye; la autenticación JWT continúa prevista para E2.
 
 Preparación previa a integración (2026-11-07): se agregan las correcciones 3.7 y 4.8,
 sin reabrir tareas anteriores ni completar sección 7. MedioPago registra el catálogo

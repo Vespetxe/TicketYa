@@ -1,7 +1,9 @@
 # Flujos de compra, pago y devoluciones (secciones 1–6)
 
-El alcance implementado utiliza Eventos, Reservas, Entradas y pasarela simulados.
-No hay integración REST real ni Gateway. La sección 6 incorpora devoluciones
+> **Documento histórico: secciones 1–6 previas a la integración.** Se conserva como antecedente de diseño y pruebas locales. La versión actual tiene API Gateway y clientes REST de Eventos, Inventario y Entradas en el perfil `integracion`; la pasarela financiera sigue simulada. Consultar [arquitectura vigente](../../../docs/entrega1/arquitectura.md), [secuencias](../../../docs/entrega1/secuencias.md), [contratos](../../../docs/entrega1/openapi/README.md) y [pruebas registradas](../../../docs/entrega1/pruebas.md). Los pendientes y ejemplos de simuladores que siguen pertenecen a ese corte histórico.
+
+El corte histórico aquí descrito utilizaba Eventos, Reservas, Entradas y pasarela simulados.
+En ese corte todavía no estaban integrados REST ni Gateway. La sección 6 incorporaba devoluciones
 voluntarias y notificaciones administrativas simuladas de cancelación de eventos.
 
 ## Compra exitosa, rechazo y vencimiento
@@ -391,7 +393,7 @@ para incorporar la columna; revisar modelo-entidades.md antes de iniciar sobre e
 
 ## Pendientes para acordar con el grupo: sección 7
 
-Todos los puntos siguientes están **PENDIENTES DE INTEGRACIÓN**. Son preguntas y
+En el corte histórico, los puntos siguientes figuraban **PENDIENTES DE INTEGRACIÓN**; no describen el estado vigente. Son preguntas y
 requisitos de compatibilidad de las interfaces actuales, no endpoints externos acordados:
 
 | Servicio | Acuerdo necesario antes de reemplazar el simulador |
