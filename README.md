@@ -17,14 +17,14 @@ Comprobar `java -version` y `mvn -version` antes de arrancar. Cada proyecto tien
 
 ## Estructura y puertos
 
-| Directorio dentro de TicketYa | Aplicación | Puerto | Esquema normal |
-|---|---|---|---|
-| `EventoCatalogo_Service` | Eventos y Catálogo | 8081 | eventos_catalogo_DB |
-| `inventarioReserva_service` | Inventario y Reservas | 8082 | db_inventario_reservas |
-| `entradas_service` | Entradas | 8083 | ticketya_entradas |
-| `comprapago_service` | Compras y Pagos | 8084 | ticketya_compras |
-| `api-gateway` | Gateway público | 8080 | Sin BD |
-| `integration-tests` | Escenarios HTTP y acreditación de aislamiento | 18080–18085 | Solo esquemas de prueba |
+| Directorio dentro de TicketYa | Aplicación | Puerto      | Esquema normal |
+|---|---|-------------|---|
+| `EventoCatalogo_Service` | Eventos y Catálogo | 8081        | eventos_catalogo_DB |
+| `inventarioReserva_service` | Inventario y Reservas | 8082        | db_inventario_reservas |
+| `entradas_service` | Entradas | 8083        | ticketya_entradas |
+| `comprapago_service` | Compras y Pagos | 8084        | ticketya_compras |
+| `api-gateway` | Gateway público | 8080        | Sin BD |
+| `integration-tests` | Escenarios HTTP y acreditación de aislamiento | 28080–28085 | Solo esquemas de prueba |
 
 `docs/entrega1` contiene los documentos vigentes. Los antecedentes junto a cada servicio se identifican en el [inventario de documentos históricos](docs/entrega1/limitaciones.md).
 
@@ -118,7 +118,7 @@ Las carpetas cubren compra numerada aprobada y devolución; compra general y can
 
 ## Pruebas seguras
 
-El entorno normal anterior es distinto del entorno de prueba. No ejecutar escenarios integrales contra 8080 ni reutilizar sus esquemas. Las pruebas de Compras requieren MySQL desechable en 33079; los escenarios HTTP requieren otra instancia en 33479, esquemas exactos `ticketya_e1_*`, perfil `pruebas-integrales`, token aleatorio y puertos 18080–18085. La acreditación verifica la BD efectiva y destinos antes de escribir; un simple indicador booleano no basta.
+El entorno normal anterior es distinto del entorno de prueba. No ejecutar escenarios integrales contra 8080 ni reutilizar sus esquemas. Las pruebas de Compras requieren MySQL desechable en 33079; los escenarios HTTP requieren otra instancia en 33489, esquemas exactos `ticketya_e1_*`, perfil `pruebas-integrales`, token aleatorio y puertos 28080–28085. La acreditación verifica la BD efectiva y destinos antes de escribir; un simple indicador booleano no basta.
 
 Las pruebas de Entrega 1 se ejecutan con Java 21 y Maven. La guía incluye el comando de la corrida completa, la acreditación de los seis procesos y la ubicación de los informes locales. [Procedimiento de pruebas](docs/entrega1/pruebas.md).
 
